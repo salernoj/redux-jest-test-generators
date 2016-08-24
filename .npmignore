@@ -1,0 +1,11 @@
+example
+src
+.eslintrc
+.babelrc
+.travis.yml
+.codeclimate.yml
+test
+.nyc_output
+travis.log
+coverage
+.npmignore
