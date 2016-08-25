@@ -105,8 +105,6 @@ describe('testActionCreatorReturnsCorrectPayload', () => {
             return result;
         };
         const message = 'should definitely create an action with type SOME_ACTION';
-
-        const spy = sinon.spy(fakeGlobal, 'it');
         
         testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, [], {}, message);
 
@@ -136,8 +134,6 @@ describe('testActionCreatorReturnsCorrectPayload', () => {
             return result;
         };
         const message = 'should definitely create an action with type SOME_ACTION';
-
-        const spy = sinon.spy(fakeGlobal, 'it');
         
         testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, args, payload, message);
 
