@@ -6,7 +6,10 @@ const mockAssertions = {
 };
 
 const proxyquire = require('proxyquire').noCallThru();
-const {testActionCreatorReturnsCorrectPayload} = proxyquire('../src/reduxMochaTestGenerators',
+const {
+    testActionCreatorReturnsCorrectPayload,
+    testAsyncActionCreatorSuccessDispatchesCorrectActions
+} = proxyquire('../src/reduxMochaTestGenerators',
     {
         './assertions': mockAssertions
     }
@@ -14,129 +17,201 @@ const {testActionCreatorReturnsCorrectPayload} = proxyquire('../src/reduxMochaTe
 
 const fakeGlobal = {};
 
-describe('testActionCreatorReturnsCorrectPayload', () => {
-    beforeEach(() => {
-        fakeGlobal.describe = (message, fn) => {
-            fn();
-        };
+describe('reduxMochaTestGenerators', () => {
+    describe('testActionCreatorReturnsCorrectPayload', () => {
+        beforeEach(() => {
+            fakeGlobal.describe = (message, fn) => {
+                fn();
+            };
 
-        fakeGlobal.it = (message, fn) => {
-            fn();
-        }
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+        });
+        it('should throw an error if no describe is passed in', () => {
+            (() => {
+                testActionCreatorReturnsCorrectPayload();
+            }).should.throw('describe is required');
+        });
+        it('should throw an error if no it is passed in', () => {
+            (() => {
+                testActionCreatorReturnsCorrectPayload(fakeGlobal.describe);
+            }).should.throw('it is required');
+        });
+        it('should throw an error if no action is passed in', () => {
+            (() => {
+                testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it);
+            }).should.throw('actionCreator is required');
+        });
+
+        it('should throw an error if no actionType is passed in', () => {
+            const actionCreator = () => { };
+            (() => {
+                testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, actionCreator);
+            }).should.throw('actionType is required');
+        });
+
+        it('should call \'describe\' with the actionCreator name passed', () => {
+            const someActionCreator = () => {
+                return {};
+            };
+            const someActionType = 'SOME_ACTION';
+
+            const spy = sinon.spy(fakeGlobal, 'describe');
+
+            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal('someActionCreator');
+        });
+
+        it('should call \'it\' with default message if none passed in', () => {
+            const someActionCreator = () => {
+                return {};
+            };
+            const someActionType = 'SOME_ACTION';
+            const message = 'should create an action with type SOME_ACTION';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call \'it\' with passed in message', () => {
+            const someActionCreator = () => {
+                return {};
+            };
+            const someActionType = 'SOME_ACTION';
+            const message = 'should definitely create an action with type SOME_ACTION';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, [], {}, message);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call assertShouldDeepEqual with the correct result and expected action with no arguments or payload', () => {
+            const someActionType = 'SOME_ACTION';
+            const result = {
+                type: someActionType
+            };
+
+            const expectedAction = {
+                type: someActionType
+            };
+
+            const someActionCreator = () => {
+                return result;
+            };
+            const message = 'should definitely create an action with type SOME_ACTION';
+
+            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, [], {}, message);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(result, expectedAction);
+        });
+
+        it('should call assertShouldDeepEqual with the correct result and expected action with arguments and payload', () => {
+            const args = [
+                'someValue'
+            ];
+
+            const payload = {
+                val: args[0]
+            };
+
+            const someActionType = 'SOME_ACTION';
+            const result = {
+                type: someActionType,
+                val: args[0]
+            };
+
+            const expectedAction = {
+                type: someActionType
+            };
+
+            const someActionCreator = () => {
+                return result;
+            };
+            const message = 'should definitely create an action with type SOME_ACTION';
+
+            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, args, payload, message);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(result, expectedAction);
+        });
     });
-    it('should throw an error if no describe is passed in', () => {
-        (() => {
-            testActionCreatorReturnsCorrectPayload();
-        }).should.throw('describe is required');
-    });
-    it('should throw an error if no it is passed in', () => {
-        (() => {
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe);
-        }).should.throw('it is required');
-    });
-    it('should throw an error if no action is passed in', () => {
-        (() => {
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it);
-        }).should.throw('actionCreator is required');
-    });
 
-    it('should throw an error if no actionType is passed in', () => {
-        const actionCreator = () => {};
-        (() => {
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, actionCreator);
-        }).should.throw('actionType is required');
-    });
+    describe('testAsyncActionCreatorSuccessDispatchesCorrectActions', () => {
+        beforeEach(() => {
+            fakeGlobal.describe = (message, fn) => {
+                fn();
+            };
 
-    it('should call \'describe\' with the actionCreator name passed', () => {
-        const someActionCreator = () => {
-            return {};
-        };
-        const someActionType = 'SOME_ACTION';
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+        });
+        it('should throw an error if no describe is passed in', () => {
+            (() => {
+                testAsyncActionCreatorSuccessDispatchesCorrectActions();
+            }).should.throw('describe is required');
+        });
+        it('should throw an error if no it is passed in', () => {
+            (() => {
+                testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe);
+            }).should.throw('it is required');
+        });
+        it('should throw an error if no asyncActionCreator is passed in', () => {
+            (() => {
+                testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it);
+            }).should.throw('asyncActionCreator is required');
+        });
 
-        const spy = sinon.spy(fakeGlobal, 'describe');
-        
-        testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType);
+        it('should throw an error if no actionMethod is passed in', () => {
+            const actionCreator = () => { };
+            (() => {
+                testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, actionCreator);
+            }).should.throw('asyncMethod is required');
+        });
 
-        spy.callCount.should.deep.equal(1);
-        spy.args[0][0].should.deep.equal('someActionCreator');
-    });
+        it('should call \'describe\' with the actionCreator name passed', () => {
+            const asyncMethod = () => {};
 
-    it('should call \'it\' with default message if none passed in', () => {
-        const someActionCreator = () => {
-            return {};
-        };
-        const someActionType = 'SOME_ACTION';
-        const message = 'should create an action with type SOME_ACTION';
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
 
-        const spy = sinon.spy(fakeGlobal, 'it');
-        
-        testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType);
+            const spy = sinon.spy(fakeGlobal, 'describe');
 
-        spy.callCount.should.deep.equal(1);
-        spy.args[0][0].should.deep.equal(message);
-    });
+            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, asyncMethod);
 
-    it('should call \'it\' with passed in message', () => {
-        const someActionCreator = () => {
-            return {};
-        };
-        const someActionType = 'SOME_ACTION';
-        const message = 'should definitely create an action with type SOME_ACTION';
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal('someAsyncActionCreator');
+        });
 
-        const spy = sinon.spy(fakeGlobal, 'it');
-        
-        testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, [], {}, message);
+        it('should call \'it\' with default message if none passed in', () => {
+            const asyncMethod = () => {};
 
-        spy.callCount.should.deep.equal(1);
-        spy.args[0][0].should.deep.equal(message);
-    });
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
 
-    it('should call assertShouldDeepEqual with the correct result and expected action with no arguments or payload', () => {
-        const someActionType = 'SOME_ACTION';
-        const result = {
-            type: someActionType
-        };
+            const message = 'should create the appropriate actions when successful';
 
-        const expectedAction = {
-            type: someActionType
-        };
+            const spy = sinon.spy(fakeGlobal, 'it');
 
-        const someActionCreator = () => {
-            return result;
-        };
-        const message = 'should definitely create an action with type SOME_ACTION';
-        
-        testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, [], {}, message);
+            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, asyncMethod);
 
-        mockAssertions.assertShouldDeepEqual.calledWithExactly(result, expectedAction);
-    });
-
-    it('should call assertShouldDeepEqual with the correct result and expected action with arguments and payload', () => {
-        const args = [
-            'someValue'
-        ];
-
-        const payload = {
-            val: args[0]
-        };
-
-        const someActionType = 'SOME_ACTION';
-        const result = {
-            type: someActionType,
-            val: args[0]
-        };
-
-        const expectedAction = {
-            type: someActionType
-        };
-
-        const someActionCreator = () => {
-            return result;
-        };
-        const message = 'should definitely create an action with type SOME_ACTION';
-        
-        testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, args, payload, message);
-
-        mockAssertions.assertShouldDeepEqual.calledWithExactly(result, expectedAction);
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
     });
 });

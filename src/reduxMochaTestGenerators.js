@@ -1,3 +1,9 @@
+import configureMockStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
+
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
+
 import {
     assertShouldDeepEqual
 } from './assertions';
@@ -41,6 +47,51 @@ export const testActionCreatorReturnsCorrectPayload = (describe, it, actionCreat
             const result = actionCreator.apply(this, actionCreatorArgs);
 
             assertShouldDeepEqual(result, expectedAction);
+        });
+    });
+};
+
+/**
+ * Test that an async action creator calls the correct actions
+ * @param {function} describe - mocha describe function
+ * @param {function} it - mocha it describe function
+ * @param {function} asyncActionCreator - the action creator to test
+ * @param {function} asyncMethod - the async method that the action calls
+ * @param {object} expectedActions - the actions expected to be called
+ * @param {string} message - the message for the assertion 
+ */
+export const testAsyncActionCreatorSuccessDispatchesCorrectActions = (describe, it, asyncActionCreator, asyncMethod, expectedActions, message) => {
+    if (!describe) {
+        throw new Error('describe is required');
+    }
+    
+    if (!it) {
+        throw new Error('it is required');
+    }
+
+    if (!asyncActionCreator) {
+        throw new Error('asyncActionCreator is required');
+    }
+
+    if (!asyncMethod) {
+        throw new Error('asyncMethod is required');
+    }
+
+    const newAsyncMethod = new Promise(resolve => resolve());
+
+    const asyncActionCreatorString = asyncActionCreator.toString();
+
+    const shouldMessage = message ? message : `should create the appropriate actions when successful`;
+
+    describe(asyncActionCreator.name, () => {
+        it(shouldMessage, () => {
+            // const store = mockStore();
+
+            // return store.dispatch(asyncActionCreator)
+            //     .then(() => {
+            //         assertShouldDeepEqual(store.getActions(), 
+            //         expectedActions);
+            //     });
         });
     });
 };

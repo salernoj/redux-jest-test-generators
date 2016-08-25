@@ -35,6 +35,9 @@
     "mocha": "^3.0.2",
     "nyc": "^8.1.0",
     "proxyquire": "^1.7.10",
+    "redux": "^3.5.2",
+    "redux-mock-store": "^1.1.4",
+    "redux-thunk": "^2.1.0",
     "sinon": "^1.17.5"
   }
 }
