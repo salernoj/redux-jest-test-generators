@@ -9,3 +9,4 @@ test
 travis.log
 coverage
 .npmignore
+.vscode
