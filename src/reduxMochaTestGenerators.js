@@ -76,23 +76,14 @@ export const testAsyncActionCreatorSuccessDispatchesCorrectActions = (describe, 
 
     const shouldMessage = message ? message : `should create the appropriate actions when successful`;
 
-    return new Promise((resolve, reject) => {
-        describe(asyncActionCreator.name, () => {
-            it(shouldMessage, done => {
-                const store = mockStore();
+    describe(asyncActionCreator.name, () => {
+        it(shouldMessage, () => {
+            const store = mockStore();
 
-                return store.dispatch(asyncActionCreator())
-                    .then(() => {
-                        assertShouldDeepEqual(store.getActions(), expectedActions);
-                        resolve();
-                    })
-                    .catch(err => {
-                        const errMessage = 'asyncActionCreator should return resolved promise when dispatched for this test.';
-                        reject(errMessage);
-                        throw new Error(errMessage);
-                        
-                    });
-            });
+            return store.dispatch(asyncActionCreator())
+                .then(() => {
+                    assertShouldDeepEqual(store.getActions(), expectedActions);
+                });
         });
     });
 };
