@@ -171,15 +171,10 @@ describe('reduxMochaTestGenerators', () => {
             }).should.throw('asyncActionCreator is required');
         });
 
-        it('should throw an error if no actionMethod is passed in', () => {
-            const actionCreator = () => { };
-            (() => {
-                testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, actionCreator);
-            }).should.throw('asyncMethod is required');
-        });
-
         it('should call \'describe\' with the actionCreator name passed', () => {
-            const asyncMethod = () => {};
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
 
             const someAsyncActionCreator = () => {
                 return dispatch => {
@@ -189,14 +184,16 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'describe');
 
-            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, asyncMethod);
+            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal('someAsyncActionCreator');
         });
 
         it('should call \'it\' with default message if none passed in', () => {
-            const asyncMethod = () => {};
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
 
             const someAsyncActionCreator = () => {
                 return dispatch => {
@@ -208,10 +205,85 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, asyncMethod);
+            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call assertShouldDeepEqual with the correct store actions and expectedActions ', done => {
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const requestAction = () => { 
+                return {
+                    type: 'REQUEST_ACTION'
+                };
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    dispatch(requestAction());
+                    return asyncMethod();
+                };
+            };
+
+            const storeActions = [
+                requestAction()
+            ];
+
+            const expectedActions = [
+                {type: 'REQUEST_ACTION'}
+            ];
+
+            const message = 'should create the appropriate actions when successful';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, expectedActions)
+                .then(() => {
+                    mockAssertions.assertShouldDeepEqual.calledWithExactly(storeActions, expectedActions);
+                })
+                .then(done);
+        });
+
+        it('should throw error if async method\'s promise is rejected ', done => {
+            const asyncMethod = () => {
+                return new Promise((resolve, reject) => reject());
+            };
+
+            const requestAction = () => { 
+                return {
+                    type: 'REQUEST_ACTION'
+                };
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    dispatch(requestAction());
+                    return asyncMethod();
+                };
+            };
+
+            const storeActions = [
+                requestAction()
+            ];
+
+            const expectedActions = [
+                {type: 'REQUEST_ACTION'}
+            ];
+
+            const message = 'should create the appropriate actions when successful';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, expectedActions)
+                .catch((err) => {
+                    err.should.deep.equal('asyncActionCreator should return resolved promise when dispatched for this test.');
+                    done();
+                })
+        
         });
     });
 });

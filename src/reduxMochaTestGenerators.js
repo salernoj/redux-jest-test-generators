@@ -22,7 +22,7 @@ export const testActionCreatorReturnsCorrectPayload = (describe, it, actionCreat
     if (!describe) {
         throw new Error('describe is required');
     }
-    
+
     if (!it) {
         throw new Error('it is required');
     }
@@ -44,15 +44,16 @@ export const testActionCreatorReturnsCorrectPayload = (describe, it, actionCreat
                 ...payload
             };
 
-            const result = actionCreator.apply(this, actionCreatorArgs);
+    const result = actionCreator.apply(this, actionCreatorArgs);
 
-            assertShouldDeepEqual(result, expectedAction);
-        });
+    assertShouldDeepEqual(result, expectedAction);
+});
     });
 };
 
 /**
- * Test that an async action creator calls the correct actions
+ * Test that an async action creator calls the correct actions.  The async method should be mocked 
+ * and should return a resolved Promise.
  * @param {function} describe - mocha describe function
  * @param {function} it - mocha it describe function
  * @param {function} asyncActionCreator - the action creator to test
@@ -60,11 +61,11 @@ export const testActionCreatorReturnsCorrectPayload = (describe, it, actionCreat
  * @param {object} expectedActions - the actions expected to be called
  * @param {string} message - the message for the assertion 
  */
-export const testAsyncActionCreatorSuccessDispatchesCorrectActions = (describe, it, asyncActionCreator, asyncMethod, expectedActions, message) => {
+export const testAsyncActionCreatorSuccessDispatchesCorrectActions = (describe, it, asyncActionCreator, expectedActions, message) => {
     if (!describe) {
         throw new Error('describe is required');
     }
-    
+
     if (!it) {
         throw new Error('it is required');
     }
@@ -73,25 +74,25 @@ export const testAsyncActionCreatorSuccessDispatchesCorrectActions = (describe, 
         throw new Error('asyncActionCreator is required');
     }
 
-    if (!asyncMethod) {
-        throw new Error('asyncMethod is required');
-    }
-
-    const newAsyncMethod = new Promise(resolve => resolve());
-
-    const asyncActionCreatorString = asyncActionCreator.toString();
-
     const shouldMessage = message ? message : `should create the appropriate actions when successful`;
 
-    describe(asyncActionCreator.name, () => {
-        it(shouldMessage, () => {
-            // const store = mockStore();
+    return new Promise((resolve, reject) => {
+        describe(asyncActionCreator.name, () => {
+            it(shouldMessage, done => {
+                const store = mockStore();
 
-            // return store.dispatch(asyncActionCreator)
-            //     .then(() => {
-            //         assertShouldDeepEqual(store.getActions(), 
-            //         expectedActions);
-            //     });
+                return store.dispatch(asyncActionCreator())
+                    .then(() => {
+                        assertShouldDeepEqual(store.getActions(), expectedActions);
+                        resolve();
+                    })
+                    .catch(err => {
+                        const errMessage = 'asyncActionCreator should return resolved promise when dispatched for this test.';
+                        reject(errMessage);
+                        throw new Error(errMessage);
+                        
+                    });
+            });
         });
     });
 };
