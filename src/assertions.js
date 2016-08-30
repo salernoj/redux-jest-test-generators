@@ -8,3 +8,11 @@ const should = require('chai').should();
 export const assertShouldDeepEqual = (a, b) => {
     a.should.deep.equal(b);
 };
+
+/**
+ * Wrapper for should.not.exist from chai
+ * @param {object} a - The object to check
+ */
+export const assertShouldNotExist = a => {
+    should.not.exist(a);
+}

@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 
 import {
-    shouldDispatchCorrectActionsWhenSuccessfulAsync
+    shouldDispatchCorrectActions
 } from '../lib/reduxMochaTestGenerators';
 
 const mockService = {

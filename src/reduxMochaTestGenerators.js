@@ -5,7 +5,8 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 import {
-    assertShouldDeepEqual
+    assertShouldDeepEqual,
+    assertShouldNotExist
 } from './assertions';
 
 /**
@@ -113,7 +114,12 @@ export const shouldReturnTheInitialState = (it, reducer, expectedInitialValue) =
 
     wrapInItBlock(it, message, () => {
         const state = reducer(undefined, {});
-        assertShouldDeepEqual(state, expectedInitialValue);
+        if (expectedInitialValue === null || expectedInitialValue === undefined) {
+            assertShouldNotExist(state);
+        } else {
+            assertShouldDeepEqual(state, expectedInitialValue);
+        }
+        
     });
 };
 
@@ -145,7 +151,12 @@ export const shouldHandleAction = (it, reducer, action, expectedValue) => {
 
     wrapInItBlock(it, message, () => {
         const state = reducer(undefined, action);
-        assertShouldDeepEqual(state, expectedValue);
+
+        if (expectedValue === null || expectedValue === undefined) {
+            assertShouldNotExist(state);
+        } else {
+            assertShouldDeepEqual(state, expectedValue);
+        }
     });
 };
 

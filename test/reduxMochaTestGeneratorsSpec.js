@@ -2,7 +2,8 @@ const should = require('chai').should();
 import sinon from 'sinon';
 
 const mockAssertions = {
-    assertShouldDeepEqual: sinon.stub()
+    assertShouldDeepEqual: sinon.stub(),
+    assertShouldNotExist: sinon.stub()
 };
 
 const proxyquire = require('proxyquire').noCallThru();
@@ -252,7 +253,7 @@ describe('reduxMochaTestGenerators', () => {
                 fn();
             }
             mockAssertions.assertShouldDeepEqual = sinon.stub();
-
+            mockAssertions.assertShouldNotExist = sinon.stub();
         });
         it('should throw an error if no it is passed in', () => {
             (() => {
@@ -327,6 +328,46 @@ describe('reduxMochaTestGenerators', () => {
             shouldHandleAction(fakeGlobal.it, reducer, action, expectedValue);
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(newValue, expectedValue).should.be.true;
+        });
+        it('should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is null', () => {
+            const expectedValue = null;
+            const action = {type: 'SOME_ACTION'};
+            const initialState = 321;
+            const newValue = 333;
+            const reducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case 'SOME_ACTION':
+                        return newValue;
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            shouldHandleAction(fakeGlobal.it, reducer, action, expectedValue);
+
+            mockAssertions.assertShouldNotExist.calledWithExactly(newValue).should.be.true;
+        });
+        it('should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is undefined', () => {
+            const expectedValue = undefined;
+            const action = {type: 'SOME_ACTION'};
+            const initialState = 321;
+            const newValue = 333;
+            const reducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case 'SOME_ACTION':
+                        return newValue;
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            shouldHandleAction(fakeGlobal.it, reducer, action, expectedValue);
+
+            mockAssertions.assertShouldNotExist.calledWithExactly(newValue).should.be.true;
         });
     });
 
