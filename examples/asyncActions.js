@@ -27,6 +27,6 @@ export const callService = () => {
             })
             .catch(error => {
                 dispatch(receiveError(error));
-            })
-    }
-}
+            });
+    };
+};

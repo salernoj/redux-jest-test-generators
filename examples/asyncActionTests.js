@@ -1,6 +1,6 @@
-const should = require('chai').should();
+/*global require, describe, it */
+require('chai').should();
 import sinon from 'sinon';
-
 
 import {
     shouldDispatchCorrectActions
@@ -8,7 +8,7 @@ import {
 
 const mockService = {
     testService: sinon.stub()
-}
+};
 
 const proxyquire = require('proxyquire').noCallThru();
 const {

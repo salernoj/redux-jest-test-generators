@@ -1,5 +1,6 @@
-const should = require('chai').should();
-import sinon from 'sinon';
+/*global require, describe, it */
+
+require('chai').should();
 
 import {
     reducerNullInitial,
@@ -8,7 +9,6 @@ import {
 } from './reducers';
 
 import {
-    shouldHandleAction,
     shouldReturnTheInitialState
 } from '../lib/reduxMochaTestGenerators';
 

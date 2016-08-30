@@ -1,4 +1,6 @@
-const should = require('chai').should();
+/*global require, describe, it */
+
+require('chai').should();
 
 import {
     shouldCreateActionWithCorrectPayload
