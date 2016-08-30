@@ -7,8 +7,8 @@ const mockAssertions = {
 
 const proxyquire = require('proxyquire').noCallThru();
 const {
-    testActionCreatorReturnsCorrectPayload,
-    testAsyncActionCreatorSuccessDispatchesCorrectActions
+    shouldCreateActionWithCorrectPayload,
+    shouldDispatchCorrectActionsWhenSuccessfulAsync
 } = proxyquire('../src/reduxMochaTestGenerators',
     {
         './assertions': mockAssertions
@@ -18,7 +18,7 @@ const {
 const fakeGlobal = {};
 
 describe('reduxMochaTestGenerators', () => {
-    describe('testActionCreatorReturnsCorrectPayload', () => {
+    describe('shouldCreateActionWithCorrectPayload', () => {
         beforeEach(() => {
             fakeGlobal.describe = (message, fn) => {
                 fn();
@@ -30,28 +30,28 @@ describe('reduxMochaTestGenerators', () => {
         });
         it('should throw an error if no describe is passed in', () => {
             (() => {
-                testActionCreatorReturnsCorrectPayload();
+                shouldCreateActionWithCorrectPayload();
             }).should.throw('describe is required');
         });
         it('should throw an error if no it is passed in', () => {
             (() => {
-                testActionCreatorReturnsCorrectPayload(fakeGlobal.describe);
+                shouldCreateActionWithCorrectPayload(fakeGlobal.describe);
             }).should.throw('it is required');
         });
         it('should throw an error if no action is passed in', () => {
             (() => {
-                testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it);
+                shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, true);
             }).should.throw('actionCreator is required');
         });
 
         it('should throw an error if no actionType is passed in', () => {
             const actionCreator = () => { };
             (() => {
-                testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, actionCreator);
+                shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, true, actionCreator);
             }).should.throw('actionType is required');
         });
 
-        it('should call \'describe\' with the actionCreator name passed', () => {
+        it('should call \'describe\' with the actionCreator name passed if shouldWrapInDescribe is true', () => {
             const someActionCreator = () => {
                 return {};
             };
@@ -59,10 +59,23 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'describe');
 
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType);
+            shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, true, someActionCreator, someActionType);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal('someActionCreator');
+        });
+
+        it('should not call \'describe\' with the actionCreator name passed if shouldWrapInDescribe is false', () => {
+            const someActionCreator = () => {
+                return {};
+            };
+            const someActionType = 'SOME_ACTION';
+
+            const spy = sinon.spy(fakeGlobal, 'describe');
+
+            shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, false, someActionCreator, someActionType);
+
+            spy.callCount.should.deep.equal(0);
         });
 
         it('should call \'it\' with default message if none passed in', () => {
@@ -74,7 +87,7 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType);
+            shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, true, someActionCreator, someActionType);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -89,7 +102,7 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, [], {}, message);
+            shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, true, someActionCreator, someActionType, [], {}, message);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -110,7 +123,7 @@ describe('reduxMochaTestGenerators', () => {
             };
             const message = 'should definitely create an action with type SOME_ACTION';
 
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, [], {}, message);
+            shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, true, someActionCreator, someActionType, [], {}, message);
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(result, expectedAction);
         });
@@ -139,13 +152,13 @@ describe('reduxMochaTestGenerators', () => {
             };
             const message = 'should definitely create an action with type SOME_ACTION';
 
-            testActionCreatorReturnsCorrectPayload(fakeGlobal.describe, fakeGlobal.it, someActionCreator, someActionType, args, payload, message);
+            shouldCreateActionWithCorrectPayload(fakeGlobal.describe, fakeGlobal.it, true, someActionCreator, someActionType, args, payload, message);
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(result, expectedAction);
         });
     });
 
-    describe('testAsyncActionCreatorSuccessDispatchesCorrectActions', () => {
+    describe('shouldDispatchCorrectActionsWhenSuccessfulAsync', () => {
         beforeEach(() => {
             fakeGlobal.describe = (message, fn) => {
                 fn();
@@ -157,21 +170,21 @@ describe('reduxMochaTestGenerators', () => {
         });
         it('should throw an error if no describe is passed in', () => {
             (() => {
-                testAsyncActionCreatorSuccessDispatchesCorrectActions();
+                shouldDispatchCorrectActionsWhenSuccessfulAsync();
             }).should.throw('describe is required');
         });
         it('should throw an error if no it is passed in', () => {
             (() => {
-                testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe);
+                shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe);
             }).should.throw('it is required');
         });
         it('should throw an error if no asyncActionCreator is passed in', () => {
             (() => {
-                testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it);
+                shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it);
             }).should.throw('asyncActionCreator is required');
         });
 
-        it('should call \'describe\' with the actionCreator name passed', () => {
+        it('should call \'describe\' with the actionCreator name passed and shouldWrapInDescribe is true', () => {
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
             };
@@ -184,10 +197,29 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'describe');
 
-            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator);
+            shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal('someAsyncActionCreator');
+        });
+
+        
+        it('should not call \'describe\' with the actionCreator name passed and shouldWrapInDescribe is false', () => {
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const spy = sinon.spy(fakeGlobal, 'describe');
+
+            shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it, false, someAsyncActionCreator);
+
+            spy.callCount.should.deep.equal(0);
         });
 
         it('should call \'it\' with default message if none passed in', () => {
@@ -205,7 +237,7 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            testAsyncActionCreatorSuccessDispatchesCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator);
+            shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);

@@ -1,7 +1,7 @@
 const should = require('chai').should();
 
 import {
-    testActionCreatorReturnsCorrectPayload
+    shouldCreateActionWithCorrectPayload
 } from '../lib/reduxMochaTestGenerators';
 
 import {
@@ -13,12 +13,17 @@ import {
 
 describe('actions', () => {
     // test payload on an action with no arguments
-    testActionCreatorReturnsCorrectPayload(describe, it, someActionNoArgs, SOME_ACTION_NO_ARGS);
+    shouldCreateActionWithCorrectPayload(
+        describe, it, 
+        true,
+        someActionNoArgs, 
+        SOME_ACTION_NO_ARGS);
 
     // test payload on an action with arguments
-    testActionCreatorReturnsCorrectPayload(
+    shouldCreateActionWithCorrectPayload(
         describe, 
         it, 
+        true,
         someActionWithArgs, 
         SOME_ACTION_WITH_ARGS, 
         ['1', '2'],
@@ -26,9 +31,10 @@ describe('actions', () => {
     );
 
     // test payload on an action with arguments with custom message
-    testActionCreatorReturnsCorrectPayload(
+    shouldCreateActionWithCorrectPayload(
         describe, 
         it, 
+        true,
         someActionWithArgs, 
         SOME_ACTION_WITH_ARGS, 
         ['1', '2'],

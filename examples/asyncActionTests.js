@@ -1,15 +1,13 @@
 const should = require('chai').should();
+import sinon from 'sinon';
+
 
 import {
-    testAsyncActionCreatorSuccessDispatchesCorrectActions
+    shouldDispatchCorrectActionsWhenSuccessfulAsync
 } from '../lib/reduxMochaTestGenerators';
 
-const result = 'asdf';
-
 const mockService = {
-    testService: () => {
-        return new Promise(resolve => resolve(result));
-    }
+    testService: sinon.stub()
 }
 
 const proxyquire = require('proxyquire').noCallThru();
@@ -25,11 +23,19 @@ const {
 );
 
 describe('asyncActions', () => {
-    testAsyncActionCreatorSuccessDispatchesCorrectActions(
-        describe, it, 
-        callService, 
-        [ 
-            {type: REQUEST},
-            {type: RECEIVE, result} 
-        ]);
+
+    describe('callService', () => {
+        const result = 'asdf';
+        mockService.testService.returns(new Promise(resolve => resolve(result)));
+        shouldDispatchCorrectActionsWhenSuccessfulAsync(
+            describe, it,
+            false,
+            callService,
+            [
+                { type: REQUEST },
+                { type: RECEIVE, result }
+            ]);
+
+
+    });
 });
