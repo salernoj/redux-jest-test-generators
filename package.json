@@ -7,7 +7,8 @@
     "build": "babel src -d lib",
     "test-examples": "mocha examples --compilers js:babel-register",
     "test-mocha": "mocha --compilers js:babel-register",
-    "test": "nyc --reporter=lcov npm run test-mocha"
+    "test": "nyc --reporter=lcov npm run test-mocha",
+    "lint": "eslint src/** --ext .js"
   },
   "repository": {
     "type": "git",

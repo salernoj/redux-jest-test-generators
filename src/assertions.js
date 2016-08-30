@@ -1,3 +1,5 @@
+/*global require*/
+
 const should = require('chai').should();
 
 /**
@@ -15,4 +17,4 @@ export const assertShouldDeepEqual = (a, b) => {
  */
 export const assertShouldNotExist = a => {
     should.not.exist(a);
-}
+};

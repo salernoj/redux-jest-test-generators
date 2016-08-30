@@ -77,7 +77,7 @@ export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe,
         throw new Error('asyncActionCreator is required');
     }
 
-    const shouldMessage = message ? message : `should create the appropriate actions when successful`;
+    const shouldMessage = message ? message : 'should create the appropriate actions when successful';
 
     wrapInDescribeBlock(describe, it, shouldWrapInDescribe, asyncActionCreator.name, shouldMessage, 
         () => {
@@ -109,7 +109,7 @@ export const shouldReturnTheInitialState = (it, reducer, expectedInitialValue) =
         throw new Error('reducer is required');
     }
 
-    const message = `should return the default state`;
+    const message = 'should return the default state';
     
 
     wrapInItBlock(it, message, () => {
@@ -177,7 +177,7 @@ const wrapInDescribeBlock = (describe, it, shouldWrap, describeMessage, itMessag
     } else {
         wrapInItBlock(it, itMessage, itCallback);
     }
-}
+};
 
 /**
  * Wrap a test in an it block
