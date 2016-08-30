@@ -54,7 +54,7 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
 
 /**
  * Test that an async action creator calls the correct actions.  The async method should be mocked 
- * and should return a resolved Promise.
+ * and should return a Promise.
  * @param {function} describe - mocha describe function
  * @param {function} it - mocha it describe function
  * @param {bool} shouldWrapInDescribe - should the method create a describe wrapper
@@ -63,7 +63,7 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
  * @param {object} expectedActions - the actions expected to be called
  * @param {string} message - the message for the assertion 
  */
-export const shouldDispatchCorrectActionsWhenSuccessfulAsync = (describe, it, shouldWrapInDescribe, asyncActionCreator, expectedActions, message) => {
+export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe, asyncActionCreator, expectedActions, setUpMocks, message) => {
     if (!describe) {
         throw new Error('describe is required');
     }
@@ -80,6 +80,10 @@ export const shouldDispatchCorrectActionsWhenSuccessfulAsync = (describe, it, sh
 
     wrapInDescribeBlock(describe, it, shouldWrapInDescribe, asyncActionCreator.name, shouldMessage, 
         () => {
+            if (setUpMocks) {
+                setUpMocks();
+            }
+
             const store = mockStore();
 
             return store.dispatch(asyncActionCreator())
@@ -87,6 +91,62 @@ export const shouldDispatchCorrectActionsWhenSuccessfulAsync = (describe, it, sh
                     assertShouldDeepEqual(store.getActions(), expectedActions);
                 });
         });
+};
+
+/**
+ * Test that a reducer returns the correct initial state
+ * @param {function} it - mocha it describe function
+ * @param {function} reducer - the reducer to test
+ * @param {object} expectedInitialValue - the value the reducer should initially return
+ */
+export const shouldReturnTheInitialState = (it, reducer, expectedInitialValue) => {
+    if (!it) {
+        throw new Error('it is required');
+    }
+
+    if (!reducer) {
+        throw new Error('reducer is required');
+    }
+
+    const message = `should return the default state`;
+    
+
+    wrapInItBlock(it, message, () => {
+        const state = reducer(undefined, {});
+        assertShouldDeepEqual(state, expectedInitialValue);
+    });
+};
+
+/**
+ * Test that the reducer handles the action correctly by returning the expectedValue
+ * @param {function} it - mocha it describe function
+ * @param {function} reducer - the reducer to test
+ * @param {object} action - the action the reducer will handle
+ * @param {object} expectedValue - the value to expect when the action to return
+ */
+export const shouldHandleAction = (it, reducer, action, expectedValue) => {
+    if (!it) {
+        throw new Error('it is required');
+    }
+
+    if (!reducer) {
+        throw new Error('reducer is required');
+    }
+
+    if (!action) {
+        throw new Error('action is required');
+    }
+
+    if (!action.type) {
+        throw new Error('an action must have a type');
+    }
+
+    const message = `should handle ${action.name}`;
+
+    wrapInItBlock(it, message, () => {
+        const state = reducer(undefined, action);
+        assertShouldDeepEqual(state, expectedValue);
+    });
 };
 
 /**

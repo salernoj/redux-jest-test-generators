@@ -8,7 +8,9 @@ const mockAssertions = {
 const proxyquire = require('proxyquire').noCallThru();
 const {
     shouldCreateActionWithCorrectPayload,
-    shouldDispatchCorrectActionsWhenSuccessfulAsync
+    shouldDispatchCorrectActions,
+    shouldHandleAction,
+    shouldReturnTheInitialState
 } = proxyquire('../src/reduxMochaTestGenerators',
     {
         './assertions': mockAssertions
@@ -158,7 +160,7 @@ describe('reduxMochaTestGenerators', () => {
         });
     });
 
-    describe('shouldDispatchCorrectActionsWhenSuccessfulAsync', () => {
+    describe('shouldDispatchCorrectActions', () => {
         beforeEach(() => {
             fakeGlobal.describe = (message, fn) => {
                 fn();
@@ -170,17 +172,17 @@ describe('reduxMochaTestGenerators', () => {
         });
         it('should throw an error if no describe is passed in', () => {
             (() => {
-                shouldDispatchCorrectActionsWhenSuccessfulAsync();
+                shouldDispatchCorrectActions();
             }).should.throw('describe is required');
         });
         it('should throw an error if no it is passed in', () => {
             (() => {
-                shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe);
+                shouldDispatchCorrectActions(fakeGlobal.describe);
             }).should.throw('it is required');
         });
         it('should throw an error if no asyncActionCreator is passed in', () => {
             (() => {
-                shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it);
+                shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it);
             }).should.throw('asyncActionCreator is required');
         });
 
@@ -197,13 +199,13 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'describe');
 
-            shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal('someAsyncActionCreator');
         });
 
-        
+
         it('should not call \'describe\' with the actionCreator name passed and shouldWrapInDescribe is false', () => {
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -217,7 +219,7 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'describe');
 
-            shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it, false, someAsyncActionCreator);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, false, someAsyncActionCreator);
 
             spy.callCount.should.deep.equal(0);
         });
@@ -237,10 +239,147 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            shouldDispatchCorrectActionsWhenSuccessfulAsync(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
+        });
+    });
+
+    describe('shouldHandleAction', () => {
+        beforeEach(() => {
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+            mockAssertions.assertShouldDeepEqual = sinon.stub();
+
+        });
+        it('should throw an error if no it is passed in', () => {
+            (() => {
+                shouldHandleAction();
+            }).should.throw('it is required');
+        });
+        it('should throw an error if no reducer is passed in', () => {
+            (() => {
+                shouldHandleAction(fakeGlobal.it);
+            }).should.throw('reducer is required');
+        });
+        it('should throw an error if no action is passed in', () => {
+            const reducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            (() => {
+                shouldHandleAction(fakeGlobal.it, reducer);
+            }).should.throw('action is required');
+        });
+        it('should throw an error if action does not have a type', () => {
+            const action = 'SOME_ACTION';            
+            const reducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+            
+            (() => {
+                shouldHandleAction(fakeGlobal.it, reducer, action);
+            }).should.throw('action must have a type');
+        });
+        it('should call \'it\' with default message if none passed in', () => {
+            const action = {type: 'SOME_ACTION'};
+            const expectedValue = 123;
+            const reducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should handle ${action.name}`;
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            shouldHandleAction(fakeGlobal.it, reducer, action, expectedValue);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+        it('should call assertShouldDeepEqual on reducer\'s value when handling the passed in action and expectedValue', () => {
+            const expectedValue = 123;
+            const action = {type: 'SOME_ACTION'};
+            const initialState = 321;
+            const newValue = 333;
+            const reducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case 'SOME_ACTION':
+                        return newValue;
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            shouldHandleAction(fakeGlobal.it, reducer, action, expectedValue);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(newValue, expectedValue).should.be.true;
+        });
+    });
+
+    describe('shouldReturnTheInitialState', () => {
+        beforeEach(() => {
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+            mockAssertions.assertShouldDeepEqual = sinon.stub();
+        });
+        it('should throw an error if no it is passed in', () => {
+            (() => {
+                shouldReturnTheInitialState();
+            }).should.throw('it is required');
+        });
+        it('should throw an error if no reducer is passed in', () => {
+            (() => {
+                shouldReturnTheInitialState(fakeGlobal.it);
+            }).should.throw('reducer is required');
+        });
+        it('should call \'it\' with default message if none passed in', () => {
+            const expectedValue = 123;
+            const reducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            shouldReturnTheInitialState(fakeGlobal.it, reducer, expectedValue);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+        it('should call assertShouldDeepEqual on reducer\'s initial state and expectedValue', () => {
+            const expectedValue = 123;
+            const initialState = 321;
+            const reducer = (state = initialState, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            shouldReturnTheInitialState(fakeGlobal.it, reducer, expectedValue);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(initialState, expectedValue).should.be.true;
         });
     });
 });
