@@ -62,7 +62,8 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
  * @param {function} asyncActionCreator - the action creator to test
  * @param {function} asyncMethod - the async method that the action calls
  * @param {object} expectedActions - the actions expected to be called
- * @param {string} message - the message for the assertion 
+ * @param {function} [setUpMocks] - function to set up mocks for the test
+ * @param {string} [message] - the message for the assertion 
  */
 export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe, asyncActionCreator, expectedActions, setUpMocks, message) => {
     if (!describe) {

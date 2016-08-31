@@ -206,7 +206,6 @@ describe('reduxMochaTestGenerators', () => {
             spy.args[0][0].should.deep.equal('someAsyncActionCreator');
         });
 
-
         it('should not call \'describe\' with the actionCreator name passed and shouldWrapInDescribe is false', () => {
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -244,6 +243,47 @@ describe('reduxMochaTestGenerators', () => {
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call \'it\' with passed in message', () => {
+            const setUpMocks = () => {};
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const message = 'some message';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, setUpMocks, message);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call setUpMocks if passed in', () => {
+            const setUpMocks = sinon.stub();
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const message = 'some message';
+
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, setUpMocks, message);
+
+            setUpMocks.callCount.should.deep.equal(1);
         });
     });
 
