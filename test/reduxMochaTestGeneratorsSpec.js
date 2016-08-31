@@ -462,5 +462,40 @@ describe('reduxMochaTestGenerators', () => {
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(initialState, expectedValue).should.be.true;
         });
+
+        it('should call assertShouldNotExist on reducer\'s value when expectedInitialValue is null', () => {
+            const expectedInitialValue = null;
+            const action = {type: 'SOME_ACTION'};
+            const initialState = null;
+            const reducer = (state = initialState, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            shouldReturnTheInitialState(fakeGlobal.it, reducer, expectedInitialValue);
+
+            mockAssertions.assertShouldNotExist.calledWithExactly(initialState).should.be.true;
+        });
+        it('should call assertShouldNotExist on reducer\'s value when expectedInitialValue is undefined', () => {
+            const expectedInitialValue = undefined;
+            const action = {type: 'SOME_ACTION'};
+            const initialState = undefined;
+            const reducer = (state = initialState, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            shouldReturnTheInitialState(fakeGlobal.it, reducer, expectedInitialValue);
+
+            mockAssertions.assertShouldNotExist.calledWithExactly(initialState).should.be.true;
+        });
     });
 });
