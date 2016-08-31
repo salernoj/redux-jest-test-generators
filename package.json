@@ -1,6 +1,6 @@
 {
   "name": "redux-mocha-test-generators",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A collection of methods to generate tests for redux actions, reducers, etc.",
   "main": "index.js",
   "scripts": {
