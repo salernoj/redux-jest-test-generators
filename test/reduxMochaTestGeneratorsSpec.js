@@ -341,7 +341,7 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const message = `should handle ${action.type.name}`;
+            const message = `should handle ${action.type}`;
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
