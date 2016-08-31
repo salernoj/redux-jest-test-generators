@@ -18,3 +18,11 @@ export const assertShouldDeepEqual = (a, b) => {
 export const assertShouldNotExist = a => {
     should.not.exist(a);
 };
+
+/**
+ * Wrapper for should.exist from chai
+ * @param {object} a - The object to check
+ */
+export const assertShouldExist = a => {
+    should.exist(a);
+};
