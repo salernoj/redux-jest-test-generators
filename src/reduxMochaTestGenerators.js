@@ -150,7 +150,7 @@ export const shouldHandleAction = (it, reducer, action, expectedValue) => {
         throw new Error('an action must have a type');
     }
 
-    const message = `should handle ${action.name}`;
+    const message = `should handle ${action.type.name}`;
 
     wrapInItBlock(it, message, () => {
         const state = reducer(undefined, action);

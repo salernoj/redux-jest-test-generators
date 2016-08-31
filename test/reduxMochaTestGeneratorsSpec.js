@@ -3,6 +3,7 @@ import sinon from 'sinon';
 
 const mockAssertions = {
     assertShouldDeepEqual: sinon.stub(),
+    assertShouldExist: sinon.stub(),
     assertShouldNotExist: sinon.stub()
 };
 
@@ -340,7 +341,7 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const message = `should handle ${action.name}`;
+            const message = `should handle ${action.type.name}`;
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
