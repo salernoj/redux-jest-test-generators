@@ -188,6 +188,22 @@ describe('reduxMochaTestGenerators', () => {
             }).should.throw('asyncActionCreator is required');
         });
 
+        it('should throw an error if setUpMocks is passed in but not a function', () => {
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            (() => {
+                shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, true, 'a');
+            }).should.throw('setUpMocks must be a function');
+        });
+
         it('should call \'describe\' with the actionCreator name passed and shouldWrapInDescribe is true', () => {
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -225,7 +241,7 @@ describe('reduxMochaTestGenerators', () => {
             spy.callCount.should.deep.equal(0);
         });
 
-        it('should call \'it\' with default message if none passed in', () => {
+        it('should call \'it\' with default message if none passed in when success is true', () => {
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
             };
@@ -236,11 +252,32 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const message = 'should create the appropriate actions when successful';
+            const message = 'should create the appropriate actions when async call successful';
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
             shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call \'it\' with default message if none passed in when success is false', () => {
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const message = 'should create the appropriate actions when async call unsuccessful';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, false);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -262,7 +299,7 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, setUpMocks, message);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, true, setUpMocks, message);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -282,7 +319,7 @@ describe('reduxMochaTestGenerators', () => {
 
             const message = 'some message';
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, setUpMocks, message);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, true, setUpMocks, message);
 
             setUpMocks.callCount.should.deep.equal(1);
         });

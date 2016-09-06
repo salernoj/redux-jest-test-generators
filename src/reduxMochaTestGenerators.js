@@ -61,12 +61,12 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
  * @param {function} it - mocha it describe function
  * @param {bool} shouldWrapInDescribe - should the method create a describe wrapper
  * @param {function} asyncActionCreator - the action creator to test
- * @param {function} asyncMethod - the async method that the action calls
  * @param {object} expectedActions - the actions expected to be called
+ * @param {bool} success - whether or not the ajax call was successful
  * @param {function} [setUpMocks] - function to set up mocks for the test
  * @param {string} [message] - the message for the assertion 
  */
-export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe, asyncActionCreator, expectedActions, setUpMocks, message) => {
+export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe, asyncActionCreator, expectedActions, success = true, setUpMocks, message) => {
     if (!describe) {
         throw new Error('describe is required');
     }
@@ -79,7 +79,12 @@ export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe,
         throw new Error('asyncActionCreator is required');
     }
 
-    const shouldMessage = message ? message : 'should create the appropriate actions when successful';
+    if (setUpMocks && typeof(setUpMocks) !== 'function') {
+        throw new Error('setUpMocks must be a function');
+    }
+
+    const successText = success ? 'successful' : 'unsuccessful';
+    const shouldMessage = message ? message : `should create the appropriate actions when async call ${successText}`;
 
     wrapInDescribeBlock(describe, it, shouldWrapInDescribe, asyncActionCreator.name, shouldMessage, 
         () => {
@@ -91,6 +96,9 @@ export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe,
 
             return store.dispatch(asyncActionCreator())
                 .then(() => {
+                    assertShouldDeepEqual(store.getActions(), expectedActions);
+                })
+                .catch(() => {
                     assertShouldDeepEqual(store.getActions(), expectedActions);
                 });
         });

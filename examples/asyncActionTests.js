@@ -34,6 +34,7 @@ describe('asyncActions', () => {
                 { type: REQUEST },
                 { type: RECEIVE, result }
             ],
+            true,
             () => {
                 mockService.testService.returns(new Promise(resolve => resolve(result)));
             });
@@ -47,6 +48,7 @@ describe('asyncActions', () => {
                 {type: REQUEST},
                 {type: RECEIVE_ERROR, error} 
             ],
+            false,
             () => {
                 mockService.testService.returns(new Promise((resolve, reject) => reject(error)));
             });

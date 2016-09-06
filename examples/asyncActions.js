@@ -21,12 +21,16 @@ export const callService = () => {
     return dispatch => {
         dispatch(request());
 
-        return testService(true)
-            .then(result => {
-                dispatch(receive(result));
-            })
-            .catch(error => {
-                dispatch(receiveError(error));
-            });
+        return new Promise((resolve, reject) => { 
+            testService(true)
+                .then(result => {
+                    dispatch(receive(result));
+                    resolve(result);
+                })
+                .catch(error => {
+                    dispatch(receiveError(error));
+                    reject(error);
+                });
+        });
     };
 };
