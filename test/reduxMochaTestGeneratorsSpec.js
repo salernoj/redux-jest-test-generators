@@ -171,37 +171,26 @@ describe('reduxMochaTestGenerators', () => {
             fakeGlobal.it = (message, fn) => {
                 fn();
             }
+
+            mockAssertions.assertShouldDeepEqual = sinon.stub();
         });
+        
         it('should throw an error if no describe is passed in', () => {
             (() => {
                 shouldDispatchCorrectActions();
             }).should.throw('describe is required');
         });
+
         it('should throw an error if no it is passed in', () => {
             (() => {
                 shouldDispatchCorrectActions(fakeGlobal.describe);
             }).should.throw('it is required');
         });
+
         it('should throw an error if no asyncActionCreator is passed in', () => {
             (() => {
                 shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it);
             }).should.throw('asyncActionCreator is required');
-        });
-
-        it('should throw an error if setUpMocks is passed in but not a function', () => {
-            const asyncMethod = () => {
-                return new Promise(resolve => resolve());
-            };
-
-            const someAsyncActionCreator = () => {
-                return dispatch => {
-                    return asyncMethod();
-                };
-            };
-
-            (() => {
-                shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, true, 'a');
-            }).should.throw('setUpMocks must be a function');
         });
 
         it('should call \'describe\' with the actionCreator name passed and shouldWrapInDescribe is true', () => {
@@ -217,7 +206,8 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'describe');
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, true)
+                .run();
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal('someAsyncActionCreator');
@@ -236,7 +226,8 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'describe');
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, false, someAsyncActionCreator);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, false)
+                .run();
 
             spy.callCount.should.deep.equal(0);
         });
@@ -256,7 +247,8 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, false)
+                .run();
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -277,7 +269,8 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, false);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, false, true)
+                .run();
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -299,7 +292,8 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, true, setUpMocks, message);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true,  true, message)
+                .run();
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -319,9 +313,74 @@ describe('reduxMochaTestGenerators', () => {
 
             const message = 'some message';
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, true, someAsyncActionCreator, {}, true, setUpMocks, message);
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, true, message)
+                .run([], setUpMocks);
 
             setUpMocks.callCount.should.deep.equal(1);
+        });
+
+        it('should call setUpMocks if passed in as first argument', () => {
+            const setUpMocks = sinon.stub();
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const message = 'some message';
+
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, true, message)
+                .run(setUpMocks);
+
+            setUpMocks.callCount.should.deep.equal(1);
+        });
+
+        it('should call assertShouldDeepEqual when asyncActionCreator is resolved', done => {
+            const setUpMocks = sinon.stub();
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const message = 'some message';
+
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, true, message)
+                .run([], setUpMocks)
+                .then(() => {
+                    mockAssertions.assertShouldDeepEqual.callCount.should.deep.equal(1);
+                    done();
+                });
+        });
+
+        it('should call assertShouldDeepEqual when asyncActionCreator is rejected', done => {
+            const setUpMocks = sinon.stub();
+            const asyncMethod = () => {
+                return new Promise((resolve, reject) => reject());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const message = 'some message';
+
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, true, message)
+                .run([], setUpMocks)
+                .then(() => {
+                    mockAssertions.assertShouldDeepEqual.callCount.should.deep.equal(1);
+                    done();
+                });
         });
     });
 

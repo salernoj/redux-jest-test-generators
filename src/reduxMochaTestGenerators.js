@@ -59,14 +59,8 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
  * and should return a Promise.
  * @param {function} describe - mocha describe function
  * @param {function} it - mocha it describe function
- * @param {bool} shouldWrapInDescribe - should the method create a describe wrapper
- * @param {function} asyncActionCreator - the action creator to test
- * @param {object} expectedActions - the actions expected to be called
- * @param {bool} success - whether or not the ajax call was successful
- * @param {function} [setUpMocks] - function to set up mocks for the test
- * @param {string} [message] - the message for the assertion 
  */
-export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe, asyncActionCreator, expectedActions, success = true, setUpMocks, message) => {
+export const shouldDispatchCorrectActions = (describe, it, asyncActionCreator, expectedActions, success = true, shouldWrapInDescribe = true, message) => {
     if (!describe) {
         throw new Error('describe is required');
     }
@@ -79,29 +73,52 @@ export const shouldDispatchCorrectActions = (describe, it, shouldWrapInDescribe,
         throw new Error('asyncActionCreator is required');
     }
 
-    if (setUpMocks && typeof(setUpMocks) !== 'function') {
-        throw new Error('setUpMocks must be a function');
-    }
+    const self = {
+        asyncActionCreator,
+        expectedActions,
+        success,
+        it,
+        describe,
+        shouldWrapInDescribe,
+        message
+    };
 
-    const successText = success ? 'successful' : 'unsuccessful';
-    const shouldMessage = message ? message : `should create the appropriate actions when async call ${successText}`;
+    /**
+     * Run the async actions test
+     * Method for running set up code. Use for mocks.
+     * @param {array} actionCreatorArgs - the args that will be passed into the asyncActionCreator
+     * @param {function} fn - set up function
+     */
+    self.run = (asyncActionCreatorArgs, fn) => {
+        return new Promise(resolve => {
+            const successText = self.success ? 'successful' : 'unsuccessful';
+            const shouldMessage = self.message ? self.message : `should create the appropriate actions when async call ${successText}`;
 
-    wrapInDescribeBlock(describe, it, shouldWrapInDescribe, asyncActionCreator.name, shouldMessage, 
-        () => {
-            if (setUpMocks) {
-                setUpMocks();
-            }
+            wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.asyncActionCreator.name, shouldMessage, 
+                () => {
+                    if (asyncActionCreatorArgs && typeof(asyncActionCreatorArgs) === 'function') {
+                        fn = asyncActionCreatorArgs;
+                    }
 
-            const store = mockStore();
-
-            return store.dispatch(asyncActionCreator())
-                .then(() => {
-                    assertShouldDeepEqual(store.getActions(), expectedActions);
-                })
-                .catch(() => {
-                    assertShouldDeepEqual(store.getActions(), expectedActions);
+                    if (fn && typeof(fn) === 'function') {
+                        fn();
+                    }
+                    
+                    const store = mockStore();
+                    store.dispatch(self.asyncActionCreator.apply(this, asyncActionCreatorArgs))
+                        .then(() => {
+                            assertShouldDeepEqual(store.getActions(), self.expectedActions);
+                            resolve();
+                        })
+                        .catch(() => {
+                            assertShouldDeepEqual(store.getActions(), self.expectedActions);
+                            resolve();
+                        });
                 });
-        });
+            });
+        };
+
+    return self;
 };
 
 /**
