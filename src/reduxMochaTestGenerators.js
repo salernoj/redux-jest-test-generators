@@ -47,9 +47,9 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
                 ...payload
             };
 
-            const result = actionCreator.apply(this, actionCreatorArgs);
+const result = actionCreator.apply(this, actionCreatorArgs);
 
-            assertShouldDeepEqual(result, expectedAction);
+assertShouldDeepEqual(result, expectedAction);
         }
     );
 };
@@ -90,33 +90,32 @@ export const shouldDispatchCorrectActions = (describe, it, asyncActionCreator, e
      * @param {function} fn - set up function
      */
     self.run = (asyncActionCreatorArgs, fn) => {
-        return new Promise(resolve => {
-            const successText = self.success ? 'successful' : 'unsuccessful';
-            const shouldMessage = self.message ? self.message : `should create the appropriate actions when async call ${successText}`;
 
-            wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.asyncActionCreator.name, shouldMessage, 
-                () => {
-                    if (asyncActionCreatorArgs && typeof(asyncActionCreatorArgs) === 'function') {
-                        fn = asyncActionCreatorArgs;
-                    }
+        const successText = self.success ? 'successful' : 'unsuccessful';
+        const shouldMessage = self.message ? self.message : `should create the appropriate actions when async call ${successText}`;
 
-                    if (fn && typeof(fn) === 'function') {
-                        fn();
-                    }
-                    
-                    const store = mockStore();
-                    store.dispatch(self.asyncActionCreator.apply(this, asyncActionCreatorArgs))
-                        .then(() => {
-                            assertShouldDeepEqual(store.getActions(), self.expectedActions);
-                            resolve();
-                        })
-                        .catch(() => {
-                            assertShouldDeepEqual(store.getActions(), self.expectedActions);
-                            resolve();
-                        });
-                });
+        wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.asyncActionCreator.name, shouldMessage,
+            () => {
+                if (asyncActionCreatorArgs && typeof (asyncActionCreatorArgs) === 'function') {
+                    fn = asyncActionCreatorArgs;
+                }
+
+                if (fn && typeof (fn) === 'function') {
+                    fn();
+                }
+
+                const store = mockStore();
+                return store.dispatch(self.asyncActionCreator.apply(this, asyncActionCreatorArgs))
+                    .then(() => {
+                        assertShouldDeepEqual(store.getActions(), self.expectedActions);
+
+                    })
+                    .catch(() => {
+                        assertShouldDeepEqual(store.getActions(), self.expectedActions);
+
+                    });
             });
-        };
+    };
 
     return self;
 };
@@ -137,13 +136,13 @@ export const shouldReturnTheInitialState = (it, reducer, expectedInitialValue) =
     }
 
     const message = 'should return the default state';
-    
+
 
     wrapInItBlock(it, message, () => {
         const state = reducer(undefined, {});
 
         compareExpectedToState(expectedInitialValue, state);
-        
+
     });
 };
 

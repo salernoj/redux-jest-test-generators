@@ -53,18 +53,18 @@ describe('asyncActions', () => {
         const resultWithArgs = 'asdf';
         const trueOrFalse = false;
         const successActionsWithArgs = [
-            { type: REQUEST },
-            { type: RECEIVE, resultWithArgs, trueOrFalse }
+            { type: REQUEST_WITH_ARGS },
+            { type: RECEIVE_WITH_ARGS, resultWithArgs, trueOrFalse }
         ];
         shouldDispatchCorrectActions(describe, it, callServiceWithArgs, successActionsWithArgs, true, false)
             .run([trueOrFalse], () => {
-                mockService.testService.returns(new Promise(resolve => resolve(result)));
+                mockService.testService.returns(new Promise(resolve => resolve(resultWithArgs)));
             });
        
         const errorWithArgs = new Error('asdf');
         const failureActionsWithArgs = [ 
-            {type: REQUEST},
-            {type: RECEIVE_ERROR, errorWithArgs} 
+            {type: REQUEST_WITH_ARGS},
+            {type: RECEIVE_ERROR_WITH_ARGS, errorWithArgs} 
         ];
         shouldDispatchCorrectActions(describe, it, callServiceWithArgs, failureActionsWithArgs, false, false)
             .run([trueOrFalse], () => {

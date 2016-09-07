@@ -23,13 +23,13 @@ export const requestWithArgs = () => {
 };
 
 export const RECEIVE_WITH_ARGS = 'RECEIVE_WITH_ARGS';
-export const receiveWithArgs = (result, trueOrFalse) => { 
-    return { type: RECEIVE_WITH_ARGS, result, trueOrFalse }; 
+export const receiveWithArgs = (resultWithArgs, trueOrFalse) => { 
+    return { type: RECEIVE_WITH_ARGS, resultWithArgs, trueOrFalse }; 
 };
 
 export const RECEIVE_ERROR_WITH_ARGS = 'RECEIVE_ERROR_WITH_ARGS';
-export const receiveErrorWithArgs = error => { 
-    return { type: RECEIVE_ERROR_WITH_ARGS, error }; 
+export const receiveErrorWithArgs = errorWithArgs => { 
+    return { type: RECEIVE_ERROR_WITH_ARGS, errorWithArgs }; 
 };
 
 export const callService = () => {
@@ -52,16 +52,16 @@ export const callService = () => {
 
 export const callServiceWithArgs = trueOrFalse => {
     return dispatch => {
-        dispatch(request());
+        dispatch(requestWithArgs());
 
         return new Promise((resolve, reject) => { 
             testService(trueOrFalse)
                 .then(result => {
-                    dispatch(receive(result));
+                    dispatch(receiveWithArgs(result, trueOrFalse));
                     resolve(result);
                 })
                 .catch(error => {
-                    dispatch(receiveError(error));
+                    dispatch(receiveErrorWithArgs(error));
                     reject(error);
                 });
         });
