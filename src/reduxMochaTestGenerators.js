@@ -141,12 +141,8 @@ export const shouldReturnTheInitialState = (it, reducer, expectedInitialValue) =
 
     wrapInItBlock(it, message, () => {
         const state = reducer(undefined, {});
-        if (expectedInitialValue === null || expectedInitialValue === undefined) {
-            assertShouldNotExist(state);
-        } else {
-            assertShouldExist(state);
-            assertShouldDeepEqual(state, expectedInitialValue);
-        }
+
+        compareExpectedToState(expectedInitialValue, state);
         
     });
 };
@@ -180,12 +176,7 @@ export const shouldHandleAction = (it, reducer, action, expectedValue) => {
     wrapInItBlock(it, message, () => {
         const state = reducer(undefined, action);
 
-        if (expectedValue === null || expectedValue === undefined) {
-            assertShouldNotExist(state);
-        } else {
-            assertShouldExist(state);
-            assertShouldDeepEqual(state, expectedValue);
-        }
+        compareExpectedToState(expectedValue, state);
     });
 };
 
@@ -218,3 +209,15 @@ const wrapInDescribeBlock = (describe, it, shouldWrap, describeMessage, itMessag
 const wrapInItBlock = (it, message, callback) => {
     it(message, callback);
 };
+
+/**
+ * Compare expected value to state
+ */
+const compareExpectedToState = (expectedValue, state) => {
+    if (expectedValue === null || expectedValue === undefined) {
+        assertShouldNotExist(state);
+    } else {
+        assertShouldExist(state);
+        assertShouldDeepEqual(state, expectedValue);
+    }
+}
