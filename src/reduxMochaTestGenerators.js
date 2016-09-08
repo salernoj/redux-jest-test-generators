@@ -268,4 +268,4 @@ const compareExpectedToState = (expectedValue, state) => {
         assertShouldExist(state);
         assertShouldDeepEqual(state, expectedValue);
     }
-}
+};
