@@ -121,6 +121,55 @@ export const shouldDispatchCorrectActions = (describe, it, asyncActionCreator, e
 };
 
 /**
+ * Test both the success and failure action for an async action creator.
+ * @param {function} describe - mocha describe function
+ * @param {function} it - mocha it describe function
+ * @param {function} asyncActionCreator - the async action creator to test
+ */
+export const shouldDispatchSuccessAndFailureActions = (describe, it, asyncActionCreator) => {
+    if (!describe) {
+        throw new Error('describe is required');
+    }
+
+    if (!it) {
+        throw new Error('it is required');
+    }
+
+    if (!asyncActionCreator) {
+        throw new Error('asyncActionCreator is required');
+    }
+
+    const self = {
+        describe,
+        it,
+        asyncActionCreator
+    };
+
+    /**
+     * Run the async actions test for succes and failure
+     * @param {Object} successConfig - success options
+     * @param {Object[]} [successConfig.args] - the args that will be passed into the asyncActionCreator
+     * @param {function} [successConfig.setUp] - set up function
+     * @param {Object} failureConfig - failure options
+     * @param {Object[]} [failureConfig.asyncActionCreatorArgs] - the args that will be passed into the asyncActionCreator
+     * @param {function} [failureConfig.setUp] - set up function
+     */
+    self.run = (successConfig, failureConfig) => {
+        const successArgs = successConfig.args ? successConfig.args : []; 
+        shouldDispatchCorrectActions(self.describe, self.it, self.asyncActionCreator, successConfig.expectedActions, true, false)
+            .run(successArgs, successConfig.setUp);
+
+        const failureArgs = failureConfig.args ? failureConfig.args : []; 
+        shouldDispatchCorrectActions(self.describe, self.it, self.asyncActionCreator, failureConfig.expectedActions, false, false)
+            .run(failureArgs, failureConfig.setUp);
+
+        
+    };
+
+    return self;
+};
+
+/**
  * Test that a reducer returns the correct initial state
  * @param {function} it - mocha it describe function
  * @param {function} reducer - the reducer to test

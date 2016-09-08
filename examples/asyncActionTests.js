@@ -3,7 +3,8 @@ require('chai').should();
 import sinon from 'sinon';
 
 import {
-    shouldDispatchCorrectActions
+    shouldDispatchCorrectActions,
+    shouldDispatchSuccessAndFailureActions
 } from '../lib/reduxMochaTestGenerators';
 
 const mockService = {
@@ -70,5 +71,38 @@ describe('asyncActions', () => {
             .run([trueOrFalse], () => {
                 mockService.testService.returns(new Promise((resolve, reject) => reject(errorWithArgs)));
             });
+    });
+
+    describe('callServiceWithArgs using shouldDispatchSuccessAndFailureActions', () => {
+        const resultWithArgs = 'asdf';
+        const trueOrFalse = false;
+        const successActionsWithArgs = [
+            { type: REQUEST_WITH_ARGS },
+            { type: RECEIVE_WITH_ARGS, resultWithArgs, trueOrFalse }
+        ];
+        const successSetUp = () => {
+            mockService.testService.returns(new Promise(resolve => resolve(resultWithArgs)));
+        };
+
+        const errorWithArgs = new Error('asdf');
+        const failureActionsWithArgs = [ 
+            {type: REQUEST_WITH_ARGS},
+            {type: RECEIVE_ERROR_WITH_ARGS, errorWithArgs} 
+        ];
+        const failureSetUp = () => {
+            mockService.testService.returns(new Promise((resolve, reject) => reject(errorWithArgs)));
+        };
+
+        shouldDispatchSuccessAndFailureActions(describe, it, callServiceWithArgs)
+            .run({
+                expectedActions: successActionsWithArgs,
+                args: [trueOrFalse],
+                setUp: successSetUp 
+            },
+            {
+                expectedActions: failureActionsWithArgs,
+                args: [trueOrFalse],
+                setUp: failureSetUp
+            })
     });
 });

@@ -11,6 +11,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const {
     shouldCreateActionWithCorrectPayload,
     shouldDispatchCorrectActions,
+    shouldDispatchSuccessAndFailureActions,
     shouldHandleAction,
     shouldReturnTheInitialState
 } = proxyquire('../src/reduxMochaTestGenerators',
@@ -337,6 +338,57 @@ describe('reduxMochaTestGenerators', () => {
                 .run(setUpMocks);
 
             setUpMocks.callCount.should.deep.equal(1);
+        });
+    });
+
+    describe('shouldDispatchSuccessAndFailureActions', () => {
+        beforeEach(() => {
+            fakeGlobal.describe = (message, fn) => {
+                fn();
+            };
+
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+
+            mockAssertions.assertShouldDeepEqual = sinon.stub();
+        });
+
+        it('should throw an error if no describe is passed in', () => {
+            (() => {
+                shouldDispatchSuccessAndFailureActions();
+            }).should.throw('describe is required');
+        });
+
+        it('should throw an error if no it is passed in', () => {
+            (() => {
+                shouldDispatchSuccessAndFailureActions(fakeGlobal.describe);
+            }).should.throw('it is required');
+        });
+
+        it('should throw an error if no asyncActionCreator is passed in', () => {
+            (() => {
+                shouldDispatchSuccessAndFailureActions(fakeGlobal.describe, fakeGlobal.it);
+            }).should.throw('asyncActionCreator is required');
+        });
+
+        it('should return an object with a method called run', () => {
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someAsyncActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const result = shouldDispatchSuccessAndFailureActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator);
+            result.run({}, {});
+
+            should.exist(result);
+            result.run.should.be.function;
+
         });
     });
 
