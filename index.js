@@ -2,5 +2,6 @@ var mochaTestGenerators = require('./lib/reduxMochaTestGenerators');
 
 exports.shouldCreateActionWithCorrectPayload = mochaTestGenerators.shouldCreateActionWithCorrectPayload;
 exports.shouldDispatchCorrectActions = mochaTestGenerators.shouldDispatchCorrectActions;
+exports.shouldDispatchSuccessAndFailureActions = mochaTestGenerators.shouldDispatchSuccessAndFailureActions;
 exports.shouldReturnTheInitialState = mochaTestGenerators.shouldReturnTheInitialState;
 exports.shouldHandleAction = mochaTestGenerators.shouldHandleAction;
