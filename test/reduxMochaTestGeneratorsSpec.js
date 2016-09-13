@@ -454,6 +454,25 @@ describe('reduxMochaTestGenerators', () => {
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
         });
+        it('should call \'it\' with passed in message', () => {
+            const action = {type: 'SOME_ACTION'};
+            const expectedValue = 123;
+            const reducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = 'some message';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            shouldHandleAction(fakeGlobal.it, reducer, action, expectedValue, undefined, message);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
         it('should call assertShouldDeepEqual on reducer\'s value when handling the passed in action and expectedValue', () => {
             const expectedValue = 123;
             const action = {type: 'SOME_ACTION'};

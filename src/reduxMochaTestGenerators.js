@@ -203,7 +203,7 @@ export const shouldReturnTheInitialState = (it, reducer, expectedInitialValue) =
  * @param {object} expectedValue - the value to expect when the action to return
  * @param {object} initialValue - the value that the reducer should have initially
  */
-export const shouldHandleAction = (it, reducer, action, expectedValue, initialValue = undefined) => {
+export const shouldHandleAction = (it, reducer, action, expectedValue, initialValue = undefined, message = null) => {
     if (!it) {
         throw new Error('it is required');
     }
@@ -220,9 +220,9 @@ export const shouldHandleAction = (it, reducer, action, expectedValue, initialVa
         throw new Error('an action must have a type');
     }
 
-    const message = `should handle ${action.type}`;
+    const itMessage = message ? message : `should handle ${action.type}`;
 
-    wrapInItBlock(it, message, () => {
+    wrapInItBlock(it, itMessage, () => {
         const state = reducer(initialValue, action);
 
         compareExpectedToState(expectedValue, state);
