@@ -47,9 +47,9 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
                 ...payload
             };
 
-const result = actionCreator.apply(this, actionCreatorArgs);
+            const result = actionCreator.apply(this, actionCreatorArgs);
 
-assertShouldDeepEqual(result, expectedAction);
+            assertShouldDeepEqual(result, expectedAction);
         }
     );
 };
@@ -201,8 +201,9 @@ export const shouldReturnTheInitialState = (it, reducer, expectedInitialValue) =
  * @param {function} reducer - the reducer to test
  * @param {object} action - the action the reducer will handle
  * @param {object} expectedValue - the value to expect when the action to return
+ * @param {object} initialValue - the value that the reducer should have initially
  */
-export const shouldHandleAction = (it, reducer, action, expectedValue) => {
+export const shouldHandleAction = (it, reducer, action, expectedValue, initialValue = undefined) => {
     if (!it) {
         throw new Error('it is required');
     }
@@ -222,7 +223,7 @@ export const shouldHandleAction = (it, reducer, action, expectedValue) => {
     const message = `should handle ${action.type}`;
 
     wrapInItBlock(it, message, () => {
-        const state = reducer(undefined, action);
+        const state = reducer(initialValue, action);
 
         compareExpectedToState(expectedValue, state);
     });
