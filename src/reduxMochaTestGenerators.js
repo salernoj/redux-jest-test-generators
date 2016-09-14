@@ -1,3 +1,5 @@
+/*global require, describe, it */
+
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
@@ -54,6 +56,67 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
     );
 };
 
+
+/**
+ * Test an asyncActionCreator
+ * @param {function} asyncActionCreator - async action creator
+ * @return {object} - the start of the test chain
+ */
+export const asyncActionCreator = asyncActionCreator => {
+    const self = {
+        asyncActionCreator,
+        describe,
+        it,
+        shouldWrapInDescribe: false,
+        args: [],
+        setUpFn: null,
+        isSuccessful: true
+    };
+
+    if (!asyncActionCreator) {
+        throw new Error('asyncActionCreator is required');
+    }
+
+    self.mochaMocks = mochaMocks;
+    self.wrapInDescribe = wrapInDescribe;
+    self.withArgs = withArgs;
+
+    self.setUp = setUp => {
+        self.setUpFn = setUp;
+        return self;
+    };
+
+    self.success = isSuccessful => {
+        self.isSuccessful = isSuccessful;
+        return self;
+    };
+
+    self.shouldDispatchActions = (expectedActions, message) => {
+        const successText = self.isSuccessful ? 'successful' : 'unsuccessful';
+        const shouldMessage = message ? message : `should create the appropriate actions when async call ${successText}`;
+
+        wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.asyncActionCreator.name, shouldMessage,
+            () => {
+                if (self.setUpFn && typeof (self.setUpFn) === 'function') {
+                    self.setUpFn();
+                }
+
+                const store = mockStore();
+                return store.dispatch(self.asyncActionCreator.apply(this, self.args))
+                    .then(() => {
+                        assertShouldDeepEqual(store.getActions(), expectedActions);
+
+                    })
+                    .catch(() => {
+                        assertShouldDeepEqual(store.getActions(), expectedActions);
+
+                    });
+            });
+    };
+
+    return self;
+};
+
 /**
  * Test an action creator
  * @param {function} actionCreator - the action creator to test
@@ -72,21 +135,9 @@ export const actionCreator = actionCreator => {
         throw new Error('actionCreator is required');
     }
 
-    self.mochaMocks = (describe, it) => {
-        self.describe = describe;
-        self.it = it;
-        return self;
-    };
-
-    self.wrapInDescribe = shouldWrap => {
-        self.shouldWrapInDescribe = shouldWrap;
-        return self;
-    };
-
-    self.withArgs = args => {
-        self.args = args;
-        return self;
-    };
+    self.mochaMocks = mochaMocks;
+    self.wrapInDescribe = wrapInDescribe;
+    self.withArgs = withArgs;
 
     self.shouldCreateAction = (expectedAction, message) => {
         const shouldMessage = message ? message : `should create an action with type ${expectedAction.type}`;
@@ -318,4 +369,20 @@ const compareExpectedToState = (expectedValue, state) => {
         assertShouldExist(state);
         assertShouldDeepEqual(state, expectedValue);
     }
+};
+
+const mochaMocks = function (describe, it) {
+    this.describe = describe;
+    this.it = it;
+    return this;
+};
+
+const wrapInDescribe = function (shouldWrap) {
+    this.shouldWrapInDescribe = shouldWrap;
+    return this;
+};
+
+const withArgs = function (args) {
+    this.args = args;
+    return this;
 };

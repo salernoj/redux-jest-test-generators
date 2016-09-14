@@ -3,6 +3,7 @@ require('chai').should();
 import sinon from 'sinon';
 
 import {
+    asyncActionCreator,
     shouldDispatchCorrectActions,
     shouldDispatchSuccessAndFailureActions
 } from '../lib/reduxMochaTestGenerators';
@@ -35,20 +36,28 @@ describe('asyncActions', () => {
             { type: REQUEST },
             { type: RECEIVE, result }
         ];
-        shouldDispatchCorrectActions(describe, it, callService, successActions, true, false)
-            .run(() => {
+
+        asyncActionCreator(callService)
+            .wrapInDescribe(false)
+            .success(true)
+            .setUp(() => {
                 mockService.testService.returns(new Promise(resolve => resolve(result)));
-            });
+            })
+            .shouldDispatchActions(successActions);
        
         const error = new Error('asdf');
         const failureActions = [ 
             {type: REQUEST},
             {type: RECEIVE_ERROR, error} 
         ];
-        shouldDispatchCorrectActions(describe, it, callService, failureActions, false, false)
-            .run(() => {
+
+        asyncActionCreator(callService)
+            .wrapInDescribe(false)
+            .success(false)
+            .setUp(() => {
                 mockService.testService.returns(new Promise((resolve, reject) => reject(error)));
-            });
+            })
+            .shouldDispatchActions(failureActions);
     });
     describe('callServiceWithArgs', () => {
         const resultWithArgs = 'asdf';
