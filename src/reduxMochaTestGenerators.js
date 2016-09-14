@@ -55,6 +55,55 @@ export const shouldCreateActionWithCorrectPayload = (describe, it, shouldWrapInD
 };
 
 /**
+ * Test an action creator
+ * @param {function} actionCreator - the action creator to test
+ * @return {object} - the start of the test chain
+ */
+export const actionCreator = actionCreator => {
+    const self = {
+        actionCreator,
+        describe,
+        it,
+        shouldWrapInDescribe: false,
+        args: []
+    };
+
+    if (!actionCreator) {
+        throw new Error('actionCreator is required');
+    }
+
+    self.mochaMocks = (describe, it) => {
+        self.describe = describe;
+        self.it = it;
+        return self;
+    };
+
+    self.wrapInDescribe = shouldWrap => {
+        self.shouldWrapInDescribe = shouldWrap;
+        return self;
+    };
+
+    self.withArgs = args => {
+        self.args = args;
+        return self;
+    };
+
+    self.shouldCreateAction = (expectedAction, message) => {
+        const shouldMessage = message ? message : `should create an action with type ${expectedAction.type}`;
+
+        wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.actionCreator.name, shouldMessage,
+            () => {
+                const result = actionCreator.apply(this, self.args);
+                assertShouldDeepEqual(result, expectedAction);
+            }
+        );
+    };
+
+    return self;
+};
+
+
+/**
  * Test that an async action creator calls the correct actions.  The async method should be mocked 
  * and should return a Promise.
  * @param {function} describe - mocha describe function
