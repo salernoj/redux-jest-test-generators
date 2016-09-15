@@ -11,6 +11,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const {
     actionCreator,
     asyncActionCreator,
+    reducer,
     shouldCreateActionWithCorrectPayload,
     shouldDispatchCorrectActions,
     shouldDispatchSuccessAndFailureActions,
@@ -235,7 +236,7 @@ describe('reduxMochaTestGenerators', () => {
         it('should mock the describe and it methods when mochaMocks is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
 
             result.describe.should.deep.equal(fakeGlobal.describe);
             result.it.should.deep.equal(fakeGlobal.it);
@@ -244,7 +245,7 @@ describe('reduxMochaTestGenerators', () => {
         it('should mock the describe and it methods when mochaMocks is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
 
             result.describe.should.deep.equal(fakeGlobal.describe);
             result.it.should.deep.equal(fakeGlobal.it);
@@ -253,8 +254,8 @@ describe('reduxMochaTestGenerators', () => {
         it('should set shouldWrapInDescribe when wrapInDescribe is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(true);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(true);
 
             result.shouldWrapInDescribe.should.be.true;
         });
@@ -263,25 +264,25 @@ describe('reduxMochaTestGenerators', () => {
             const args = [1, 2];
             const someActionCreator = getDefaultActionCreator();
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(true)
-                            .withArgs(args);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(true)
+                .withArgs(args);
 
             result.args.should.deep.equal(args);
         });
 
         it('should call \'describe\' if wrapInDescribe is called with true', () => {
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
             const someActionCreator = () => {
                 return someAction;
             };
             const spy = sinon.spy(fakeGlobal, 'describe');
 
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(true)
-                            .shouldCreateAction(someAction);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(true)
+                .shouldCreateAction(someAction);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal('someActionCreator');
@@ -289,31 +290,31 @@ describe('reduxMochaTestGenerators', () => {
 
         it('should not call \'describe\' if wrapInDescribe is called with false', () => {
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
             const someActionCreator = () => {
                 return someAction;
             };
             const spy = sinon.spy(fakeGlobal, 'describe');
 
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(false)
-                            .shouldCreateAction(someAction);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(false)
+                .shouldCreateAction(someAction);
 
             spy.callCount.should.deep.equal(0);
         });
 
         it('should not call \'describe\'', () => {
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
             const someActionCreator = () => {
                 return someAction;
             };
             const spy = sinon.spy(fakeGlobal, 'describe');
 
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldCreateAction(someAction);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldCreateAction(someAction);
 
             spy.callCount.should.deep.equal(0);
         });
@@ -322,15 +323,15 @@ describe('reduxMochaTestGenerators', () => {
             const message = 'should create an action with type SOME_ACTION';
 
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
             const someActionCreator = () => {
                 return someAction;
             };
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldCreateAction(someAction);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldCreateAction(someAction);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -338,17 +339,17 @@ describe('reduxMochaTestGenerators', () => {
 
         it('should call \'it\' with passed in message', () => {
             const message = 'should definitely create an action with type SOME_ACTION';
-            
+
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
             const someActionCreator = () => {
                 return someAction;
             };
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldCreateAction(someAction, message);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldCreateAction(someAction, message);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -356,42 +357,42 @@ describe('reduxMochaTestGenerators', () => {
 
         it('should call assertShouldDeepEqual with the correct result and expected action with no arguments', () => {
             const message = 'should definitely create an action with type SOME_ACTION';
-            
+
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
             const someActionCreator = () => {
                 return someAction;
             };
 
-            const expectedAction = {type: someActionType};
+            const expectedAction = { type: someActionType };
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldCreateAction(someAction, message);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldCreateAction(someAction, message);
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
         });
 
         it('should call assertShouldDeepEqual with the correct result and expected action with arguments', () => {
             const message = 'should definitely create an action with type SOME_ACTION';
-            
+
             const args = [1, 2];
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType };
+            const someAction = { type: someActionType };
             const someActionCreator = () => {
                 return someAction;
             };
 
-            const expectedAction = {type: someActionType};
+            const expectedAction = { type: someActionType };
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = actionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .withArgs(args)
-                            .shouldCreateAction(someAction, message);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .withArgs(args)
+                .shouldCreateAction(someAction, message);
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
         });
@@ -461,7 +462,7 @@ describe('reduxMochaTestGenerators', () => {
         it('should mock the describe and it methods when mochaMocks is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
 
             result.describe.should.deep.equal(fakeGlobal.describe);
             result.it.should.deep.equal(fakeGlobal.it);
@@ -470,7 +471,7 @@ describe('reduxMochaTestGenerators', () => {
         it('should mock the describe and it methods when mochaMocks is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
 
             result.describe.should.deep.equal(fakeGlobal.describe);
             result.it.should.deep.equal(fakeGlobal.it);
@@ -479,8 +480,8 @@ describe('reduxMochaTestGenerators', () => {
         it('should set shouldWrapInDescribe when wrapInDescribe is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(true);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(true);
 
             result.shouldWrapInDescribe.should.be.true;
         });
@@ -489,16 +490,16 @@ describe('reduxMochaTestGenerators', () => {
             const args = [1, 2];
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(true)
-                            .withArgs(args);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(true)
+                .withArgs(args);
 
             result.args.should.deep.equal(args);
         });
 
         it('should call \'describe\' if wrapInDescribe is called with true', () => {
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
 
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -513,9 +514,9 @@ describe('reduxMochaTestGenerators', () => {
             const spy = sinon.spy(fakeGlobal, 'describe');
 
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(true)
-                            .shouldDispatchActions([someAction]);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(true)
+                .shouldDispatchActions([someAction]);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal('someActionCreator');
@@ -523,7 +524,7 @@ describe('reduxMochaTestGenerators', () => {
 
         it('should not call \'describe\' if wrapInDescribe is called with false', () => {
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
 
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -538,16 +539,16 @@ describe('reduxMochaTestGenerators', () => {
             const spy = sinon.spy(fakeGlobal, 'describe');
 
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .wrapInDescribe(false)
-                            .shouldDispatchActions([someAction]);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .wrapInDescribe(false)
+                .shouldDispatchActions([someAction]);
 
             spy.callCount.should.deep.equal(0);
         });
 
         it('should not call \'describe\'', () => {
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
 
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -562,8 +563,8 @@ describe('reduxMochaTestGenerators', () => {
             const spy = sinon.spy(fakeGlobal, 'describe');
 
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldDispatchActions([someAction]);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldDispatchActions([someAction]);
 
             spy.callCount.should.deep.equal(0);
         });
@@ -572,7 +573,7 @@ describe('reduxMochaTestGenerators', () => {
             const message = 'should create an action with type SOME_ACTION';
 
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
 
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -587,8 +588,8 @@ describe('reduxMochaTestGenerators', () => {
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldDispatchActions([someAction], message);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldDispatchActions([someAction], message);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -596,9 +597,9 @@ describe('reduxMochaTestGenerators', () => {
 
         it('should call \'it\' with passed in message', () => {
             const message = 'should definitely create an action with type SOME_ACTION';
-            
+
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
 
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -613,8 +614,8 @@ describe('reduxMochaTestGenerators', () => {
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldDispatchActions([someAction], message);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldDispatchActions([someAction], message);
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
@@ -622,9 +623,9 @@ describe('reduxMochaTestGenerators', () => {
 
         it('should call assertShouldDeepEqual with the correct result and expected action with no arguments', () => {
             const message = 'should definitely create an action with type SOME_ACTION';
-            
+
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
 
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -636,23 +637,23 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const expectedAction = {type: someActionType};
+            const expectedAction = { type: someActionType };
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .shouldDispatchActions([someAction], message);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldDispatchActions([someAction], message);
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
         });
 
         it('should call assertShouldDeepEqual with the correct result and expected action with arguments', () => {
             const message = 'should definitely create an action with type SOME_ACTION';
-            
+
             const args = [1, 2];
             const someActionType = 'SOME_ACTION';
-            const someAction = {type: someActionType};
+            const someAction = { type: someActionType };
 
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
@@ -664,17 +665,291 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const expectedAction = {type: someActionType};
+            const expectedAction = { type: someActionType };
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
             const result = asyncActionCreator(someActionCreator)
-                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                            .withArgs(args)
-                            .shouldDispatchActions([someAction], message);
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .withArgs(args)
+                .shouldDispatchActions([someAction], message);
 
             mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
         });
+    });
+
+    describe('reducer', () => {
+        beforeEach(() => {
+            fakeGlobal.describe = (message, fn) => {
+                fn();
+            };
+
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+        });
+
+        it('should throw an error if no reducer is passed in', () => {
+            (() => {
+                reducer();
+            }).should.throw('reducer is required');
+        });
+
+        it('should return an object with the correct properties with initial values', () => {
+            const expectedValue = 123;
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const result = reducer(testReducer);
+
+            result.should.have.property('reducer');
+            result.reducer.should.deep.equal(testReducer);
+
+            result.should.have.property('it');
+            result.it.should.deep.equal(it);
+        });
+
+        it('should return an object with the correct methods', () => {
+            const expectedValue = 123;
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const result = reducer(testReducer);
+
+            result.should.have.property('mochaMocks');
+            result.should.have.property('shouldReturnTheInitialState');
+            result.should.have.property('shouldHandleAction');
+
+        });
+    });
+    describe('reducer.shouldReturnTheInitialState', () => {
+        beforeEach(() => {
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+            mockAssertions.assertShouldDeepEqual = sinon.stub();
+            mockAssertions.assertShouldNotExist = sinon.stub();
+        });
+
+        it('should call \'it\' with default message if none passed in', () => {
+            const expectedValue = 123;
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldReturnTheInitialState(expectedValue);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call \'it\' with passed in message', () => {
+            const expectedValue = 123;
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = 'should return the default state123';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldReturnTheInitialState(expectedValue, message);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call assertShouldDeepEqual on reducer\'s initial state and expectedValue', () => {
+            const expectedValue = 123;
+            const initialState = 321;
+            const testReducer = (state = initialState, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldReturnTheInitialState(expectedValue);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(initialState, expectedValue).should.be.true;
+        });
+    });
+    describe('reducer.shouldHandleAction', () => {
+        beforeEach(() => {
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+            mockAssertions.assertShouldDeepEqual = sinon.stub();
+            mockAssertions.assertShouldNotExist = sinon.stub();
+        });
+
+        it('should throw an error if no action is passed in', () => {
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            (() => {
+                reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldHandleAction();
+            }).should.throw('action is required');
+        });
+
+        it('should throw an error if no action doesn\'t have a type', () => {
+            const action = 'SOME_ACTION';
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            (() => {
+                reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldHandleAction(action);
+            }).should.throw('an action must have a type');
+        });
+
+        it('should call \'it\' with default message if none passed in', () => {
+            const action = { type: 'SOME_ACTION' };
+            const expectedValue = 123;
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should handle ${action.type}`;
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldHandleAction(action, expectedValue);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+        it('should call \'it\' with passed in message', () => {
+            const action = { type: 'SOME_ACTION' };
+            const expectedValue = 123;
+            const testReducer = (state = null, action) => {
+                switch (action.type) {
+                    default:
+                        return state;
+                };
+            };
+
+            const message = 'some message';
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldHandleAction(action, expectedValue, undefined, message);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call assertShouldDeepEqual on reducer\'s value when handling the passed in action and expectedValue', () => {
+            const expectedValue = 123;
+            const action = { type: 'SOME_ACTION' };
+            const initialState = 321;
+            const newValue = 333;
+            const testReducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case 'SOME_ACTION':
+                        return newValue;
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldHandleAction(action, expectedValue);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(newValue, expectedValue).should.be.true;
+        });
+        it('should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is null', () => {
+            const expectedValue = null;
+            const action = { type: 'SOME_ACTION' };
+            const initialState = 321;
+            const newValue = 333;
+            const testReducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case 'SOME_ACTION':
+                        return newValue;
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldHandleAction(action, expectedValue);
+
+            mockAssertions.assertShouldNotExist.calledWithExactly(newValue).should.be.true;
+        });
+        it('should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is undefined', () => {
+            const expectedValue = undefined;
+            const action = { type: 'SOME_ACTION' };
+            const initialState = 321;
+            const newValue = 333;
+            const testReducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case 'SOME_ACTION':
+                        return newValue;
+                    default:
+                        return state;
+                };
+            };
+
+            const message = `should return the default state`;
+            
+            reducer(testReducer)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .shouldHandleAction(action, expectedValue);
+
+            mockAssertions.assertShouldNotExist.calledWithExactly(newValue).should.be.true;
+        });
+
     });
 
     describe('shouldDispatchCorrectActions', () => {
@@ -689,7 +964,7 @@ describe('reduxMochaTestGenerators', () => {
 
             mockAssertions.assertShouldDeepEqual = sinon.stub();
         });
-        
+
         it('should throw an error if no describe is passed in', () => {
             (() => {
                 shouldDispatchCorrectActions();
@@ -792,7 +1067,7 @@ describe('reduxMochaTestGenerators', () => {
         });
 
         it('should call \'it\' with passed in message', () => {
-            const setUpMocks = () => {};
+            const setUpMocks = () => { };
             const asyncMethod = () => {
                 return new Promise(resolve => resolve());
             };
@@ -807,7 +1082,7 @@ describe('reduxMochaTestGenerators', () => {
 
             const spy = sinon.spy(fakeGlobal, 'it');
 
-            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true,  true, message)
+            shouldDispatchCorrectActions(fakeGlobal.describe, fakeGlobal.it, someAsyncActionCreator, {}, true, true, message)
                 .run();
 
             spy.callCount.should.deep.equal(1);
@@ -937,20 +1212,20 @@ describe('reduxMochaTestGenerators', () => {
             }).should.throw('action is required');
         });
         it('should throw an error if action does not have a type', () => {
-            const action = 'SOME_ACTION';            
+            const action = 'SOME_ACTION';
             const reducer = (state = null, action) => {
                 switch (action.type) {
                     default:
                         return state;
                 };
             };
-            
+
             (() => {
                 shouldHandleAction(fakeGlobal.it, reducer, action);
             }).should.throw('action must have a type');
         });
         it('should call \'it\' with default message if none passed in', () => {
-            const action = {type: 'SOME_ACTION'};
+            const action = { type: 'SOME_ACTION' };
             const expectedValue = 123;
             const reducer = (state = null, action) => {
                 switch (action.type) {
@@ -969,7 +1244,7 @@ describe('reduxMochaTestGenerators', () => {
             spy.args[0][0].should.deep.equal(message);
         });
         it('should call \'it\' with passed in message', () => {
-            const action = {type: 'SOME_ACTION'};
+            const action = { type: 'SOME_ACTION' };
             const expectedValue = 123;
             const reducer = (state = null, action) => {
                 switch (action.type) {
@@ -989,7 +1264,7 @@ describe('reduxMochaTestGenerators', () => {
         });
         it('should call assertShouldDeepEqual on reducer\'s value when handling the passed in action and expectedValue', () => {
             const expectedValue = 123;
-            const action = {type: 'SOME_ACTION'};
+            const action = { type: 'SOME_ACTION' };
             const initialState = 321;
             const newValue = 333;
             const reducer = (state = initialState, action) => {
@@ -1009,7 +1284,7 @@ describe('reduxMochaTestGenerators', () => {
         });
         it('should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is null', () => {
             const expectedValue = null;
-            const action = {type: 'SOME_ACTION'};
+            const action = { type: 'SOME_ACTION' };
             const initialState = 321;
             const newValue = 333;
             const reducer = (state = initialState, action) => {
@@ -1029,7 +1304,7 @@ describe('reduxMochaTestGenerators', () => {
         });
         it('should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is undefined', () => {
             const expectedValue = undefined;
-            const action = {type: 'SOME_ACTION'};
+            const action = { type: 'SOME_ACTION' };
             const initialState = 321;
             const newValue = 333;
             const reducer = (state = initialState, action) => {
@@ -1103,7 +1378,7 @@ describe('reduxMochaTestGenerators', () => {
 
         it('should call assertShouldNotExist on reducer\'s value when expectedInitialValue is null', () => {
             const expectedInitialValue = null;
-            const action = {type: 'SOME_ACTION'};
+            const action = { type: 'SOME_ACTION' };
             const initialState = null;
             const reducer = (state = initialState, action) => {
                 switch (action.type) {
@@ -1120,7 +1395,7 @@ describe('reduxMochaTestGenerators', () => {
         });
         it('should call assertShouldNotExist on reducer\'s value when expectedInitialValue is undefined', () => {
             const expectedInitialValue = undefined;
-            const action = {type: 'SOME_ACTION'};
+            const action = { type: 'SOME_ACTION' };
             const initialState = undefined;
             const reducer = (state = initialState, action) => {
                 switch (action.type) {

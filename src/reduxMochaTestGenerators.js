@@ -151,6 +151,66 @@ export const actionCreator = actionCreator => {
     return self;
 };
 
+/**
+ * 
+ */
+export const reducer = reducer => {
+    const self = {
+        reducer,
+        it
+    };
+
+    if (!reducer) {
+        throw new Error('reducer is required');
+    }
+
+    self.mochaMocks = mochaMocks;
+
+    /** 
+     * Test whether or not the reducer's initial state equals the expected value passed in
+     * @param {object} expectedValue - The value expected for the initial state
+     * @param {string} [message] - optional message for the test 
+     */
+    self.shouldReturnTheInitialState = (expectedValue, message = undefined) => {
+        const shouldMessage = message ? message : 'should return the default state';
+
+        wrapInItBlock(self.it, shouldMessage, () => {
+            const state = self.reducer(undefined, {});
+            compareExpectedToState(expectedValue, state);
+        });
+
+        return self;
+    };
+
+    /**
+     * Test whether or not the reducer handles an action appropriately
+     * @param {object} action - the action to test
+     * @param {string} action.type - the string type of the action
+     * @param {object} [initialValue] - optional initial value for the reducer
+     * @param {string} [message] - optional message for the test to return
+     */
+    self.shouldHandleAction = (action, expectedValue, initialValue = undefined, message = undefined) => {
+        if (!action) {
+            throw new Error('action is required');
+        }
+
+        if (!action.type) {
+            throw new Error('an action must have a type');
+        }
+
+        const itMessage = message ? message : `should handle ${action.type}`;
+
+        wrapInItBlock(self.it, itMessage, () => {
+            const state = self.reducer(initialValue, action);
+
+            compareExpectedToState(expectedValue, state);
+        });
+
+        return self;
+    };
+
+    return self;
+}
 
 /**
  * Test that an async action creator calls the correct actions.  The async method should be mocked 
@@ -369,9 +429,9 @@ const compareExpectedToState = (expectedValue, state) => {
     }
 };
 
-const mochaMocks = function (describe, it) {
-    this.describe = describe;
-    this.it = it;
+const mochaMocks = function (mockDescribe, mockIt) {
+    this.describe = mockDescribe ? mockDescribe : describe;
+    this.it = mockIt ? mockIt : it;
     return this;
 };
 
