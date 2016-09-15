@@ -10,6 +10,7 @@ const mockAssertions = {
 const proxyquire = require('proxyquire').noCallThru();
 const {
     actionCreator,
+    asyncActionCreator,
     shouldCreateActionWithCorrectPayload,
     shouldDispatchCorrectActions,
     shouldDispatchSuccessAndFailureActions,
@@ -397,6 +398,284 @@ describe('reduxMochaTestGenerators', () => {
 
     });
 
+    describe('asyncActionCreator', () => {
+        const getDefaultActionCreator = () => {
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            return () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+        };
+
+        beforeEach(() => {
+            fakeGlobal.describe = (message, fn) => {
+                fn();
+            };
+
+            fakeGlobal.it = (message, fn) => {
+                fn();
+            }
+        });
+
+        it('should throw an error if no asyncActionCreator is passed in', () => {
+            (() => {
+                asyncActionCreator();
+            }).should.throw('asyncActionCreator is required');
+        });
+
+        it('should return an object with the correct properties with initial values', () => {
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator);
+
+            result.should.have.property('asyncActionCreator');
+            result.asyncActionCreator.should.deep.equal(someActionCreator);
+
+            result.should.have.property('describe');
+            result.describe.should.deep.equal(describe);
+
+            result.should.have.property('it');
+            result.it.should.deep.equal(it);
+
+            result.should.have.property('shouldWrapInDescribe');
+            result.shouldWrapInDescribe.should.be.false;
+
+            result.should.have.property('args');
+            result.args.should.deep.equal([]);
+        });
+
+        it('should return an object with the correct methods', () => {
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator);
+
+            result.should.have.property('mochaMocks');
+            result.should.have.property('wrapInDescribe');
+            result.should.have.property('withArgs');
+            result.should.have.property('shouldDispatchActions');
+
+        });
+
+        it('should mock the describe and it methods when mochaMocks is called', () => {
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+
+            result.describe.should.deep.equal(fakeGlobal.describe);
+            result.it.should.deep.equal(fakeGlobal.it);
+        });
+
+        it('should mock the describe and it methods when mochaMocks is called', () => {
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+
+            result.describe.should.deep.equal(fakeGlobal.describe);
+            result.it.should.deep.equal(fakeGlobal.it);
+        });
+
+        it('should set shouldWrapInDescribe when wrapInDescribe is called', () => {
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .wrapInDescribe(true);
+
+            result.shouldWrapInDescribe.should.be.true;
+        });
+
+        it('should set args when withArgs is called', () => {
+            const args = [1, 2];
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .wrapInDescribe(true)
+                            .withArgs(args);
+
+            result.args.should.deep.equal(args);
+        });
+
+        it('should call \'describe\' if wrapInDescribe is called with true', () => {
+            const someActionType = 'SOME_ACTION';
+            const someAction = {type: someActionType};
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const spy = sinon.spy(fakeGlobal, 'describe');
+
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .wrapInDescribe(true)
+                            .shouldDispatchActions([someAction]);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal('someActionCreator');
+        });
+
+        it('should not call \'describe\' if wrapInDescribe is called with false', () => {
+            const someActionType = 'SOME_ACTION';
+            const someAction = {type: someActionType};
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const spy = sinon.spy(fakeGlobal, 'describe');
+
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .wrapInDescribe(false)
+                            .shouldDispatchActions([someAction]);
+
+            spy.callCount.should.deep.equal(0);
+        });
+
+        it('should not call \'describe\'', () => {
+            const someActionType = 'SOME_ACTION';
+            const someAction = {type: someActionType};
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const spy = sinon.spy(fakeGlobal, 'describe');
+
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .shouldDispatchActions([someAction]);
+
+            spy.callCount.should.deep.equal(0);
+        });
+
+        it('should call \'it\' with default message if none passed in', () => {
+            const message = 'should create an action with type SOME_ACTION';
+
+            const someActionType = 'SOME_ACTION';
+            const someAction = {type: someActionType};
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .shouldDispatchActions([someAction], message);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call \'it\' with passed in message', () => {
+            const message = 'should definitely create an action with type SOME_ACTION';
+            
+            const someActionType = 'SOME_ACTION';
+            const someAction = {type: someActionType};
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .shouldDispatchActions([someAction], message);
+
+            spy.callCount.should.deep.equal(1);
+            spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call assertShouldDeepEqual with the correct result and expected action with no arguments', () => {
+            const message = 'should definitely create an action with type SOME_ACTION';
+            
+            const someActionType = 'SOME_ACTION';
+            const someAction = {type: someActionType};
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const expectedAction = {type: someActionType};
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .shouldDispatchActions([someAction], message);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
+        });
+
+        it('should call assertShouldDeepEqual with the correct result and expected action with arguments', () => {
+            const message = 'should definitely create an action with type SOME_ACTION';
+            
+            const args = [1, 2];
+            const someActionType = 'SOME_ACTION';
+            const someAction = {type: someActionType};
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const expectedAction = {type: someActionType};
+
+            const spy = sinon.spy(fakeGlobal, 'it');
+
+            const result = asyncActionCreator(someActionCreator)
+                            .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                            .withArgs(args)
+                            .shouldDispatchActions([someAction], message);
+
+            mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
+        });
+    });
 
     describe('shouldDispatchCorrectActions', () => {
         beforeEach(() => {

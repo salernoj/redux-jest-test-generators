@@ -105,11 +105,9 @@ export const asyncActionCreator = asyncActionCreator => {
                 return store.dispatch(self.asyncActionCreator.apply(this, self.args))
                     .then(() => {
                         assertShouldDeepEqual(store.getActions(), expectedActions);
-
                     })
                     .catch(() => {
                         assertShouldDeepEqual(store.getActions(), expectedActions);
-
                     });
             });
     };

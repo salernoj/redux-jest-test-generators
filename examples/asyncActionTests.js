@@ -32,11 +32,7 @@ describe('asyncActions', () => {
 
     describe('callService', () => {
         const result = 'asdf';
-        const successActions = [
-            { type: REQUEST },
-            { type: RECEIVE, result }
-        ];
-
+        const successActions = [{ type: REQUEST },{ type: RECEIVE, result }];
         asyncActionCreator(callService)
             .wrapInDescribe(false)
             .success(true)
@@ -46,11 +42,7 @@ describe('asyncActions', () => {
             .shouldDispatchActions(successActions);
        
         const error = new Error('asdf');
-        const failureActions = [ 
-            {type: REQUEST},
-            {type: RECEIVE_ERROR, error} 
-        ];
-
+        const failureActions = [{type: REQUEST},{type: RECEIVE_ERROR, error}];
         asyncActionCreator(callService)
             .wrapInDescribe(false)
             .success(false)
@@ -66,52 +58,25 @@ describe('asyncActions', () => {
             { type: REQUEST_WITH_ARGS },
             { type: RECEIVE_WITH_ARGS, resultWithArgs, trueOrFalse }
         ];
-        shouldDispatchCorrectActions(describe, it, callServiceWithArgs, successActionsWithArgs, true, false)
-            .run([trueOrFalse], () => {
+        asyncActionCreator(callServiceWithArgs)
+            .setUp(() => {
                 mockService.testService.returns(new Promise(resolve => resolve(resultWithArgs)));
-            });
+            })
+            .success(true)
+            .withArgs([trueOrFalse])
+            .shouldDispatchActions(successActionsWithArgs);
        
         const errorWithArgs = new Error('asdf');
         const failureActionsWithArgs = [ 
             {type: REQUEST_WITH_ARGS},
             {type: RECEIVE_ERROR_WITH_ARGS, errorWithArgs} 
         ];
-        shouldDispatchCorrectActions(describe, it, callServiceWithArgs, failureActionsWithArgs, false, false)
-            .run([trueOrFalse], () => {
+        asyncActionCreator(callServiceWithArgs)
+            .setUp(() => {
                 mockService.testService.returns(new Promise((resolve, reject) => reject(errorWithArgs)));
-            });
-    });
-
-    describe('callServiceWithArgs using shouldDispatchSuccessAndFailureActions', () => {
-        const resultWithArgs = 'asdf';
-        const trueOrFalse = false;
-        const successActionsWithArgs = [
-            { type: REQUEST_WITH_ARGS },
-            { type: RECEIVE_WITH_ARGS, resultWithArgs, trueOrFalse }
-        ];
-        const successSetUp = () => {
-            mockService.testService.returns(new Promise(resolve => resolve(resultWithArgs)));
-        };
-
-        const errorWithArgs = new Error('asdf');
-        const failureActionsWithArgs = [ 
-            {type: REQUEST_WITH_ARGS},
-            {type: RECEIVE_ERROR_WITH_ARGS, errorWithArgs} 
-        ];
-        const failureSetUp = () => {
-            mockService.testService.returns(new Promise((resolve, reject) => reject(errorWithArgs)));
-        };
-
-        shouldDispatchSuccessAndFailureActions(describe, it, callServiceWithArgs)
-            .run({
-                expectedActions: successActionsWithArgs,
-                args: [trueOrFalse],
-                setUp: successSetUp 
-            },
-            {
-                expectedActions: failureActionsWithArgs,
-                args: [trueOrFalse],
-                setUp: failureSetUp
             })
+            .success(true)
+            .withArgs([trueOrFalse])
+            .shouldDispatchActions(failureActionsWithArgs);
     });
 });
