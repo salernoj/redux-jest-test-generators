@@ -477,6 +477,25 @@ describe('reduxMochaTestGenerators', () => {
             result.it.should.deep.equal(fakeGlobal.it);
         });
 
+        it('should set setUpFn when setUp is called', () => {
+            const someFn = () => {};
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .setUp(someFn);
+
+            result.setUpFn.should.deep.equal(someFn);
+        });
+
+        it('should set isSuccessful when success is called', () => {
+            const someActionCreator = getDefaultActionCreator();
+            const result = asyncActionCreator(someActionCreator)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .success(false);
+
+            result.isSuccessful.should.be.false;
+        });
+
         it('should set shouldWrapInDescribe when wrapInDescribe is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
@@ -619,6 +638,32 @@ describe('reduxMochaTestGenerators', () => {
 
             spy.callCount.should.deep.equal(1);
             spy.args[0][0].should.deep.equal(message);
+        });
+
+        it('should call setUp function if set', () => {
+            const message = 'should definitely create an action with type SOME_ACTION';
+
+            const someActionType = 'SOME_ACTION';
+            const someAction = { type: someActionType };
+
+            const asyncMethod = () => {
+                return new Promise(resolve => resolve());
+            };
+
+            const someActionCreator = () => {
+                return dispatch => {
+                    return asyncMethod();
+                };
+            };
+
+            const setUp = sinon.stub();
+
+            const result = asyncActionCreator(someActionCreator)
+                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .setUp(setUp)
+                .shouldDispatchActions([someAction], message);
+
+            setUp.callCount.should.deep.equal(1);
         });
 
         it('should call assertShouldDeepEqual with the correct result and expected action with no arguments', () => {
@@ -942,7 +987,7 @@ describe('reduxMochaTestGenerators', () => {
             };
 
             const message = `should return the default state`;
-            
+
             reducer(testReducer)
                 .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
                 .shouldHandleAction(action, expectedValue);
