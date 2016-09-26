@@ -441,6 +441,10 @@ const wrapInDescribe = function (shouldWrap) {
 };
 
 const withArgs = function (args) {
-    this.args = args;
+    this.args = arguments.length > 1 ? [].slice.call(arguments) : args ? isArray(args) ? args : [args] : [];
     return this;
+};
+
+const isArray = obj => {
+    return Object.prototype.toString.call(obj) === '[object Array]';
 };
