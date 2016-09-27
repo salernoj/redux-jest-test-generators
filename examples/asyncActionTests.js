@@ -63,7 +63,7 @@ describe('asyncActions', () => {
                 mockService.testService.returns(new Promise(resolve => resolve(resultWithArgs)));
             })
             .success(true)
-            .withArgs([trueOrFalse])
+            .withArgs(trueOrFalse)
             .shouldDispatchActions(successActionsWithArgs);
        
         const errorWithArgs = new Error('asdf');
@@ -76,7 +76,7 @@ describe('asyncActions', () => {
                 mockService.testService.returns(new Promise((resolve, reject) => reject(errorWithArgs)));
             })
             .success(true)
-            .withArgs([trueOrFalse])
+            .withArgs(trueOrFalse)
             .shouldDispatchActions(failureActionsWithArgs);
     });
 });

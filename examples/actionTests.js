@@ -23,12 +23,12 @@ describe('actions', () => {
     // test payload on an action with arguments
     actionCreator(someActionWithArgs)
         .wrapInDescribe(true)
-        .withArgs(['1', '2'])
+        .withArgs('1', '2')
         .shouldCreateAction({type: SOME_ACTION_WITH_ARGS, arg1: '1', arg2: '2'});
 
     // test payload on an action with arguments with custom message
     actionCreator(someActionWithArgs)
         .wrapInDescribe(true)
-        .withArgs(['1', '2'])
+        .withArgs('1', '2')
         .shouldCreateAction({type: SOME_ACTION_WITH_ARGS, arg1: '1', arg2: '2'}, 'should work!!!!!1');
 });

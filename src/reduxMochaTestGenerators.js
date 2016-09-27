@@ -440,8 +440,8 @@ const wrapInDescribe = function (shouldWrap) {
     return this;
 };
 
-const withArgs = function (args) {
-    this.args = arguments.length > 1 ? [].slice.call(arguments) : args ? isArray(args) ? args : [args] : [];
+const withArgs = function () {
+    this.args = [].slice.call(arguments);
     return this;
 };
 

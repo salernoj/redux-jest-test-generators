@@ -266,7 +266,7 @@ describe('reduxMochaTestGenerators', () => {
             const result = actionCreator(someActionCreator)
                 .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
                 .wrapInDescribe(true)
-                .withArgs(args);
+                .withArgs(1, 2);
 
             result.args.should.deep.equal(args);
         });
@@ -511,7 +511,7 @@ describe('reduxMochaTestGenerators', () => {
             const result = asyncActionCreator(someActionCreator)
                 .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
                 .wrapInDescribe(true)
-                .withArgs(args);
+                .withArgs(1, 2);
 
             result.args.should.deep.equal(args);
         });
