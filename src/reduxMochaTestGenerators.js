@@ -444,7 +444,3 @@ const withArgs = function () {
     this.args = [].slice.call(arguments);
     return this;
 };
-
-const isArray = obj => {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-};
