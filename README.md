@@ -1,12 +1,25 @@
 # redux-mocha-test-generators
 
-Methods for testing redux actions, async actions, and reducers with mocha to avoid repetitive boilerplate.
+Methods for testing redux action creators, async action creators, and reducers with mocha to avoid repetitive boilerplate.
 
 ## Installation
 ```
 npm install redux-mocha-test-generators
 ```
 ## Usage
+
+### Table Of Contents
+- [Testing Action Creators](#testing-action-creators)
+- [Testing Async Action Creators](#testing-async-action-creators)
+- [Testing Reducers](#testing-reducers)
+
+### Testing action creators
+Call the actionCreator method by passing the action creator you want to test and 
+then chain the test methods to the result.
+
+### Testing async action creators
+Call the asyncActionCreator method by passing the action creator you want to test and 
+then chain the test methods to the result.
 
 ### Testing reducers
 Call the reducer method by passing in the reducer you want to test and then 
