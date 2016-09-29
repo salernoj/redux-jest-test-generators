@@ -1,6 +1,9 @@
 # redux-mocha-test-generators
-
 Methods for testing redux action creators, async action creators, and reducers with mocha to avoid repetitive boilerplate.
+
+[![Build Status](https://travis-ci.org/jesalerno84/redux-mocha-test-generators.svg?branch=master)](https://travis-ci.org/jesalerno84/redux-mocha-test-generators)
+[![Code Climate](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators/badges/gpa.svg)](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators)
+[![Test Coverage](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators/badges/coverage.svg)](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators/coverage)
 
 ## Installation
 ```
