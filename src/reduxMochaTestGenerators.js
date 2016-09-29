@@ -93,7 +93,7 @@ export const asyncActionCreator = asyncActionCreator => {
 
     self.shouldDispatchActions = (expectedActions, message) => {
         const successText = self.isSuccessful ? 'successful' : 'unsuccessful';
-        const shouldMessage = message ? message : `should create the appropriate actions when async call ${successText}`;
+        const shouldMessage = message ? message : `should dispatch the appropriate actions when async call ${successText}`;
 
         wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.asyncActionCreator.name, shouldMessage,
             () => {
