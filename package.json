@@ -6,7 +6,8 @@
   "scripts": {
     "build": "babel src -d lib",
     "test-watch": "jest --watch",
-    "test": "nyc --reporter=lcov npm run test-mocha",
+    "test-examples": "jest --config jest.config.examples.js",
+    "test": "jest --coverage",
     "lint": "eslint src/** --ext .js",
     "lint-examples": "eslint examples/** --ext .js"
   },

@@ -3,8 +3,7 @@
 require('chai').should();
 
 import {
-    actionCreator,
-    shouldCreateActionWithCorrectPayload
+    actionCreator
 } from '../lib/reduxMochaTestGenerators';
 
 import {
