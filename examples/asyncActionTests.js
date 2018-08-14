@@ -3,9 +3,7 @@ require('chai').should();
 import sinon from 'sinon';
 
 import {
-    asyncActionCreator,
-    shouldDispatchCorrectActions,
-    shouldDispatchSuccessAndFailureActions
+    asyncActionCreator
 } from '../lib/reduxMochaTestGenerators';
 
 const mockService = {

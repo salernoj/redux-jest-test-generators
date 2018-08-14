@@ -1,4 +1,4 @@
-/*global describe, it */
+/*global describe, test */
 
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -21,7 +21,7 @@ export const asyncActionCreator = asyncActionCreator => {
     const self = {
         asyncActionCreator,
         describe,
-        it,
+        test,
         shouldWrapInDescribe: false,
         args: [],
         setUpFn: null,
@@ -32,7 +32,7 @@ export const asyncActionCreator = asyncActionCreator => {
         throw new Error('asyncActionCreator is required');
     }
 
-    self.mochaMocks = mochaMocks;
+    self.jestMocks = jestMocks;
     self.wrapInDescribe = wrapInDescribe;
     self.withArgs = withArgs;
 
@@ -47,10 +47,11 @@ export const asyncActionCreator = asyncActionCreator => {
     };
 
     self.shouldDispatchActions = (expectedActions, message) => {
+        return new Promise(resolve => {
         const successText = self.isSuccessful ? 'successful' : 'unsuccessful';
         const shouldMessage = message ? message : `should dispatch the appropriate actions when async call ${successText}`;
 
-        wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.asyncActionCreator.name, shouldMessage,
+        wrapInDescribeBlock(self.describe, self.test, self.shouldWrapInDescribe, self.asyncActionCreator.name, shouldMessage,
             () => {
                 if (self.setUpFn && typeof (self.setUpFn) === 'function') {
                     self.setUpFn();
@@ -60,11 +61,14 @@ export const asyncActionCreator = asyncActionCreator => {
                 return store.dispatch(self.asyncActionCreator.apply(this, self.args))
                     .then(() => {
                         assertShouldDeepEqual(store.getActions(), expectedActions);
+                        resolve();
                     })
                     .catch(() => {
                         assertShouldDeepEqual(store.getActions(), expectedActions);
+                        resolve();
                     });
             });
+        });
     };
 
     return self;
@@ -79,7 +83,7 @@ export const actionCreator = actionCreator => {
     const self = {
         actionCreator,
         describe,
-        it,
+        test,
         shouldWrapInDescribe: false,
         args: []
     };
@@ -88,14 +92,14 @@ export const actionCreator = actionCreator => {
         throw new Error('actionCreator is required');
     }
 
-    self.mochaMocks = mochaMocks;
+    self.jestMocks = jestMocks;
     self.wrapInDescribe = wrapInDescribe;
     self.withArgs = withArgs;
 
     self.shouldCreateAction = (expectedAction, message) => {
         const shouldMessage = message ? message : `should create an action with type ${expectedAction.type}`;
 
-        wrapInDescribeBlock(self.describe, self.it, self.shouldWrapInDescribe, self.actionCreator.name, shouldMessage,
+        wrapInDescribeBlock(self.describe, self.test, self.shouldWrapInDescribe, self.actionCreator.name, shouldMessage,
             () => {
                 const result = actionCreator.apply(this, self.args);
                 assertShouldDeepEqual(result, expectedAction);
@@ -112,14 +116,14 @@ export const actionCreator = actionCreator => {
 export const reducer = reducer => {
     const self = {
         reducer,
-        it
+        test
     };
 
     if (!reducer) {
         throw new Error('reducer is required');
     }
 
-    self.mochaMocks = mochaMocks;
+    self.jestMocks = jestMocks;
 
     /** 
      * Test whether or not the reducer's initial state equals the expected value passed in
@@ -129,7 +133,7 @@ export const reducer = reducer => {
     self.shouldReturnTheInitialState = (expectedValue, message = undefined) => {
         const shouldMessage = message ? message : 'should return the default state';
 
-        wrapInItBlock(self.it, shouldMessage, () => {
+        wrapInItBlock(self.test, shouldMessage, () => {
             const state = self.reducer(undefined, {});
             compareExpectedToState(expectedValue, state);
         });
@@ -155,7 +159,7 @@ export const reducer = reducer => {
 
         const itMessage = message ? message : `should handle ${action.type}`;
 
-        wrapInItBlock(self.it, itMessage, () => {
+        wrapInItBlock(self.test, itMessage, () => {
             const state = self.reducer(initialValue, action);
 
             compareExpectedToState(expectedValue, state);
@@ -169,32 +173,32 @@ export const reducer = reducer => {
 
 /**
  * Wrap a test in describe block
- * @param {function} describe - mocha describe function
- * @param {function} it - mocha it describe function
+ * @param {function} describe - jest describe function
+ * @param {function} test - jest test  function
  * @param {bool} shouldWrap - should wrap in describe block
  * @param {string} describeMessage - the message for the describe block
  * @param {string} itMessage - the message for the it block
  * @param {function} itCallback - the callback for the it
  */
-const wrapInDescribeBlock = (describe, it, shouldWrap, describeMessage, itMessage, itCallback) => {
+const wrapInDescribeBlock = (describe, test, shouldWrap, describeMessage, itMessage, itCallback) => {
     if (shouldWrap) {
         describe(describeMessage, () => {
-            wrapInItBlock(it, itMessage, itCallback);
+            wrapInItBlock(test, itMessage, itCallback);
         });
     } else {
-        wrapInItBlock(it, itMessage, itCallback);
+        wrapInItBlock(test, itMessage, itCallback);
     }
 };
 
 /**
  * Wrap a test in an it block
- * @param {function} describe - mocha describe function
- * @param {function} it - mocha it describe function
+ * @param {function} describe - jest describe function
+ * @param {function} it - jest test function
  * @param {string} message - the message for the it block
  * @param {function} callback - the callback for the it
  */
-const wrapInItBlock = (it, message, callback) => {
-    it(message, callback);
+const wrapInItBlock = (test, message, callback) => {
+    test(message, callback);
 };
 
 /**
@@ -209,9 +213,9 @@ const compareExpectedToState = (expectedValue, state) => {
     }
 };
 
-const mochaMocks = function (mockDescribe, mockIt) {
+const jestMocks = function (mockDescribe, mockTest) {
     this.describe = mockDescribe ? mockDescribe : describe;
-    this.it = mockIt ? mockIt : it;
+    this.test = mockTest ? mockTest : test;
     return this;
 };
 

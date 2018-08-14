@@ -1,24 +1,26 @@
-/*global describe, it, test, beforeEach, require */
+/*global describe, jest, test, beforeEach, require, expect */
 
-import jest from 'jest';
-import sinon from 'sinon';
 
 const mockAssertions = {
-    assertShouldDeepEqual: sinon.stub(),
-    assertShouldExist: sinon.stub(),
-    assertShouldNotExist: sinon.stub()
+    assertShouldDeepEqual: jest.fn(),
+    assertShouldExist: jest.fn(),
+    assertShouldNotExist: jest.fn()
 };
 
-jest.mock('./assertions', () => mockAssertions);
+jest.mock('../src/assertions', () => mockAssertions);
+
 const {
     actionCreator,
     asyncActionCreator,
     reducer,
-} = require('../src/reduxMochaTestGenerators');
+} = require('../src/reduxJestTestGenerators');
 
 const fakeGlobal = {};
 
-describe('reduxMochaTestGenerators', () => {
+describe('reduxJestTestGenerators', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
 
     describe('actionCreator', () => {
         const getDefaultActionCreator = () => {
@@ -41,15 +43,15 @@ describe('reduxMochaTestGenerators', () => {
                 fn();
             };
 
-            fakeGlobal.it = (message, fn) => {
+            fakeGlobal.test = (message, fn) => {
                 fn();
             };
         });
 
         test('should throw an error if no actionCreator is passed in', () => {
-            (() => {
+            expect(() => {
                 actionCreator();
-            }).should.throw('actionCreator is required');
+            }).toThrow('actionCreator is required');
         });
 
         test(
@@ -58,20 +60,20 @@ describe('reduxMochaTestGenerators', () => {
                 const someActionCreator = getDefaultActionCreator();
                 const result = actionCreator(someActionCreator);
 
-                result.should.have.property('actionCreator');
-                result.actionCreator.should.deep.equal(someActionCreator);
+                expect(result).toHaveProperty('actionCreator');
+                expect(result.actionCreator).toEqual(someActionCreator);
 
-                result.should.have.property('describe');
-                result.describe.should.deep.equal(describe);
+                expect(result).toHaveProperty('describe');
+                expect(result.describe).toEqual(describe);
 
-                result.should.have.property('it');
-                result.it.should.deep.equal(it);
+                expect(result).toHaveProperty('test');
+                expect(result.test).toEqual(test);
 
-                result.should.have.property('shouldWrapInDescribe');
-                result.shouldWrapInDescribe.should.be.false;
+                expect(result).toHaveProperty('shouldWrapInDescribe');
+                expect(result.shouldWrapInDescribe).toBe(false);
 
-                result.should.have.property('args');
-                result.args.should.deep.equal([]);
+                expect(result).toHaveProperty('args');
+                expect(result.args).toEqual([]);
             }
         );
 
@@ -79,55 +81,55 @@ describe('reduxMochaTestGenerators', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = actionCreator(someActionCreator);
 
-            result.should.have.property('mochaMocks');
-            result.should.have.property('wrapInDescribe');
-            result.should.have.property('withArgs');
-            result.should.have.property('shouldCreateAction');
+            expect(result).toHaveProperty('jestMocks');
+            expect(result).toHaveProperty('wrapInDescribe');
+            expect(result).toHaveProperty('withArgs');
+            expect(result).toHaveProperty('shouldCreateAction');
 
         });
 
         test(
-            'should mock the describe and it methods when mochaMocks is called',
+            'should mock the describe and test methods when jestMocks is called',
             () => {
                 const someActionCreator = getDefaultActionCreator();
                 const result = actionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test);
 
-                result.describe.should.deep.equal(fakeGlobal.describe);
-                result.it.should.deep.equal(fakeGlobal.it);
+                expect(result.describe).toEqual(fakeGlobal.describe);
+                expect(result.test).toEqual(fakeGlobal.test);
             }
         );
 
         test(
-            'should mock the describe and it methods when mochaMocks is called',
+            'should mock the describe and test methods when jestMocks is called',
             () => {
                 const someActionCreator = getDefaultActionCreator();
                 const result = actionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test);
 
-                result.describe.should.deep.equal(fakeGlobal.describe);
-                result.it.should.deep.equal(fakeGlobal.it);
+                expect(result.describe).toEqual(fakeGlobal.describe);
+                expect(result.test).toEqual(fakeGlobal.test);
             }
         );
 
         test('should set shouldWrapInDescribe when wrapInDescribe is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = actionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .wrapInDescribe(true);
 
-            result.shouldWrapInDescribe.should.be.true;
+            expect(result.shouldWrapInDescribe).toBe(true);
         });
 
         test('should set args when withArgs is called', () => {
             const args = [1, 2];
             const someActionCreator = getDefaultActionCreator();
             const result = actionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .wrapInDescribe(true)
                 .withArgs(1, 2);
 
-            result.args.should.deep.equal(args);
+            expect(result.args).toEqual(args);
         });
 
         test('should call \'describe\' if wrapInDescribe is called with true', () => {
@@ -136,15 +138,15 @@ describe('reduxMochaTestGenerators', () => {
             const someActionCreator = () => {
                 return someAction;
             };
-            const spy = sinon.spy(fakeGlobal, 'describe');
+            const spy = jest.spyOn(fakeGlobal, 'describe');
 
             actionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .wrapInDescribe(true)
                 .shouldCreateAction(someAction);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal('someActionCreator');
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual('someActionCreator');
         });
 
         test(
@@ -155,14 +157,14 @@ describe('reduxMochaTestGenerators', () => {
                 const someActionCreator = () => {
                     return someAction;
                 };
-                const spy = sinon.spy(fakeGlobal, 'describe');
+                const spy = jest.spyOn(fakeGlobal, 'describe');
 
                 actionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .wrapInDescribe(false)
                     .shouldCreateAction(someAction);
 
-                spy.callCount.should.deep.equal(0);
+                expect(spy.mock.calls.length).toEqual(0);
             }
         );
 
@@ -172,13 +174,13 @@ describe('reduxMochaTestGenerators', () => {
             const someActionCreator = () => {
                 return someAction;
             };
-            const spy = sinon.spy(fakeGlobal, 'describe');
+            const spy = jest.spyOn(fakeGlobal, 'describe');
 
             actionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldCreateAction(someAction);
 
-            spy.callCount.should.deep.equal(0);
+            expect(spy.mock.calls.length).toEqual(0);
         });
 
         test('should call \'it\' with default message if none passed in', () => {
@@ -189,14 +191,14 @@ describe('reduxMochaTestGenerators', () => {
             const someActionCreator = () => {
                 return someAction;
             };
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             actionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldCreateAction(someAction);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
 
         test('should call \'it\' with passed in message', () => {
@@ -207,14 +209,14 @@ describe('reduxMochaTestGenerators', () => {
             const someActionCreator = () => {
                 return someAction;
             };
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             actionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldCreateAction(someAction, message);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
 
         test(
@@ -230,13 +232,16 @@ describe('reduxMochaTestGenerators', () => {
 
                 const expectedAction = { type: someActionType };
 
-                sinon.spy(fakeGlobal, 'it');
+                jest.spyOn(fakeGlobal, 'test');
 
                 actionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .shouldCreateAction(someAction, message);
 
-                mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
+
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][0]).toBe(someAction);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][1]).toEqual(expectedAction);
             }
         );
 
@@ -254,14 +259,16 @@ describe('reduxMochaTestGenerators', () => {
 
                 const expectedAction = { type: someActionType };
 
-                sinon.spy(fakeGlobal, 'it');
+                jest.spyOn(fakeGlobal, 'test');
 
                 actionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .withArgs(args)
                     .shouldCreateAction(someAction, message);
 
-                mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][0]).toBe(someAction);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][1]).toEqual(expectedAction);
             }
         );
 
@@ -285,15 +292,15 @@ describe('reduxMochaTestGenerators', () => {
                 fn();
             };
 
-            fakeGlobal.it = (message, fn) => {
+            fakeGlobal.test = (message, fn) => {
                 fn();
             };
         });
 
         test('should throw an error if no asyncActionCreator is passed in', () => {
-            (() => {
+            expect(() => {
                 asyncActionCreator();
-            }).should.throw('asyncActionCreator is required');
+            }).toThrow('asyncActionCreator is required');
         });
 
         test(
@@ -302,20 +309,20 @@ describe('reduxMochaTestGenerators', () => {
                 const someActionCreator = getDefaultActionCreator();
                 const result = asyncActionCreator(someActionCreator);
 
-                result.should.have.property('asyncActionCreator');
-                result.asyncActionCreator.should.deep.equal(someActionCreator);
+                expect(result).toHaveProperty('asyncActionCreator');
+                expect(result.asyncActionCreator).toEqual(someActionCreator);
 
-                result.should.have.property('describe');
-                result.describe.should.deep.equal(describe);
+                expect(result).toHaveProperty('describe');
+                expect(result.describe).toEqual(describe);
 
-                result.should.have.property('it');
-                result.it.should.deep.equal(it);
+                expect(result).toHaveProperty('test');
+                expect(result.test).toEqual(test);
 
-                result.should.have.property('shouldWrapInDescribe');
-                result.shouldWrapInDescribe.should.be.false;
+                expect(result).toHaveProperty('shouldWrapInDescribe');
+                expect(result.shouldWrapInDescribe).toBe(false);
 
-                result.should.have.property('args');
-                result.args.should.deep.equal([]);
+                expect(result).toHaveProperty('args');
+                expect(result.args).toEqual([]);
             }
         );
 
@@ -323,74 +330,74 @@ describe('reduxMochaTestGenerators', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator);
 
-            result.should.have.property('mochaMocks');
-            result.should.have.property('wrapInDescribe');
-            result.should.have.property('withArgs');
-            result.should.have.property('shouldDispatchActions');
+            expect(result).toHaveProperty('jestMocks');
+            expect(result).toHaveProperty('wrapInDescribe');
+            expect(result).toHaveProperty('withArgs');
+            expect(result).toHaveProperty('shouldDispatchActions');
 
         });
 
         test(
-            'should mock the describe and it methods when mochaMocks is called',
+            'should mock the describe and test methods when jestMocks is called',
             () => {
                 const someActionCreator = getDefaultActionCreator();
                 const result = asyncActionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test);
 
-                result.describe.should.deep.equal(fakeGlobal.describe);
-                result.it.should.deep.equal(fakeGlobal.it);
+                expect(result.describe).toEqual(fakeGlobal.describe);
+                expect(result.test).toEqual(fakeGlobal.test);
             }
         );
 
         test(
-            'should mock the describe and it methods when mochaMocks is called',
+            'should mock the describe and test methods when jestMocks is called',
             () => {
                 const someActionCreator = getDefaultActionCreator();
                 const result = asyncActionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it);
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test);
 
-                result.describe.should.deep.equal(fakeGlobal.describe);
-                result.it.should.deep.equal(fakeGlobal.it);
+                expect(result.describe).toEqual(fakeGlobal.describe);
+                expect(result.test).toEqual(fakeGlobal.test);
             }
         );
 
         test('should set setUpFn when setUp is called', () => {
-            const someFn = () => {};
+            const someFn = () => { };
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .setUp(someFn);
 
-            result.setUpFn.should.deep.equal(someFn);
+            expect(result.setUpFn).toEqual(someFn);
         });
 
         test('should set isSuccessful when success is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .success(false);
 
-            result.isSuccessful.should.be.false;
+            expect(result.isSuccessful).toBe(false);
         });
 
         test('should set shouldWrapInDescribe when wrapInDescribe is called', () => {
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .wrapInDescribe(true);
 
-            result.shouldWrapInDescribe.should.be.true;
+            expect(result.shouldWrapInDescribe).toBe(true);
         });
 
         test('should set args when withArgs is called', () => {
             const args = [1, 2];
             const someActionCreator = getDefaultActionCreator();
             const result = asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .wrapInDescribe(true)
                 .withArgs(1, 2);
 
-            result.args.should.deep.equal(args);
+            expect(result.args).toEqual(args);
         });
 
         test('should call \'describe\' if wrapInDescribe is called with true', () => {
@@ -407,15 +414,15 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const spy = sinon.spy(fakeGlobal, 'describe');
+            const spy = jest.spyOn(fakeGlobal, 'describe');
 
             asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .wrapInDescribe(true)
                 .shouldDispatchActions([someAction]);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal('someActionCreator');
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual('someActionCreator');
         });
 
         test(
@@ -434,14 +441,14 @@ describe('reduxMochaTestGenerators', () => {
                     };
                 };
 
-                const spy = sinon.spy(fakeGlobal, 'describe');
+                const spy = jest.spyOn(fakeGlobal, 'describe');
 
                 asyncActionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .wrapInDescribe(false)
                     .shouldDispatchActions([someAction]);
 
-                spy.callCount.should.deep.equal(0);
+                expect(spy.mock.calls.length).toEqual(0);
             }
         );
 
@@ -459,13 +466,13 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const spy = sinon.spy(fakeGlobal, 'describe');
+            const spy = jest.spyOn(fakeGlobal, 'describe');
 
             asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldDispatchActions([someAction]);
 
-            spy.callCount.should.deep.equal(0);
+            expect(spy.mock.calls.length).toEqual(0);
         });
 
         test('should call \'it\' with default message if none passed in', () => {
@@ -484,14 +491,14 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldDispatchActions([someAction], message);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
 
         test('should call \'it\' with passed in message', () => {
@@ -510,14 +517,15 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldDispatchActions([someAction], message);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
 
         test('should call setUp function if set', () => {
@@ -536,14 +544,14 @@ describe('reduxMochaTestGenerators', () => {
                 };
             };
 
-            const setUp = sinon.stub();
+            const setUp = jest.fn();
 
             asyncActionCreator(someActionCreator)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .setUp(setUp)
                 .shouldDispatchActions([someAction], message);
 
-            setUp.callCount.should.deep.equal(1);
+            expect(setUp.mock.calls.length).toEqual(1);
         });
 
         test(
@@ -566,19 +574,23 @@ describe('reduxMochaTestGenerators', () => {
 
                 const expectedAction = { type: someActionType };
 
-                sinon.spy(fakeGlobal, 'it');
+                jest.spyOn(fakeGlobal, 'test');
 
                 asyncActionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                    .shouldDispatchActions([someAction], message);
-
-                mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
+                    .shouldDispatchActions([someAction], message)
+                    .then(() => {
+                        expect(mockAssertions.assertShouldDeepEqual.mock.calls.length).toBe(1);
+                        expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][0]).toBe(someAction);
+                        expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][1]).toBe(expectedAction);
+                    });
             }
         );
 
         test(
             'should call assertShouldDeepEqual with the correct result and expected action with arguments',
             () => {
+
                 const message = 'should definitely create an action with type SOME_ACTION';
 
                 const args = [1, 2];
@@ -597,14 +609,19 @@ describe('reduxMochaTestGenerators', () => {
 
                 const expectedAction = { type: someActionType };
 
-                sinon.spy(fakeGlobal, 'it');
+                jest.spyOn(fakeGlobal, 'test');
 
                 asyncActionCreator(someActionCreator)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .withArgs(args)
-                    .shouldDispatchActions([someAction], message);
+                    .shouldDispatchActions([someAction], message)
+                    .then(() => {
+                        expect(mockAssertions.assertShouldDeepEqual.mock.calls.length).toBe(1);
+                        expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][0]).toBe(someAction);
+                        expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][1]).toBe(expectedAction);
+                    });
 
-                mockAssertions.assertShouldDeepEqual.calledWithExactly(someAction, expectedAction);
+
             }
         );
     });
@@ -615,15 +632,15 @@ describe('reduxMochaTestGenerators', () => {
                 fn();
             };
 
-            fakeGlobal.it = (message, fn) => {
+            fakeGlobal.test = (message, fn) => {
                 fn();
             };
         });
 
         test('should throw an error if no reducer is passed in', () => {
-            (() => {
+            expect(() => {
                 reducer();
-            }).should.throw('reducer is required');
+            }).toThrow('reducer is required');
         });
 
         test(
@@ -638,11 +655,11 @@ describe('reduxMochaTestGenerators', () => {
 
                 const result = reducer(testReducer);
 
-                result.should.have.property('reducer');
-                result.reducer.should.deep.equal(testReducer);
+                expect(result).toHaveProperty('reducer');
+                expect(result.reducer).toEqual(testReducer);
 
-                result.should.have.property('it');
-                result.it.should.deep.equal(it);
+                expect(result).toHaveProperty('test');
+                expect(result.test).toEqual(test);
             }
         );
 
@@ -651,24 +668,24 @@ describe('reduxMochaTestGenerators', () => {
                 switch (action.type) {
                     default:
                         return state;
-                };
+                }
             };
 
             const result = reducer(testReducer);
 
-            result.should.have.property('mochaMocks');
-            result.should.have.property('shouldReturnTheInitialState');
-            result.should.have.property('shouldHandleAction');
+            expect(result).toHaveProperty('jestMocks');
+            expect(result).toHaveProperty('shouldReturnTheInitialState');
+            expect(result).toHaveProperty('shouldHandleAction');
 
         });
     });
     describe('reducer.shouldReturnTheInitialState', () => {
         beforeEach(() => {
-            fakeGlobal.it = (message, fn) => {
+            fakeGlobal.test = (message, fn) => {
                 fn();
             };
-            mockAssertions.assertShouldDeepEqual = sinon.stub();
-            mockAssertions.assertShouldNotExist = sinon.stub();
+            mockAssertions.assertShouldDeepEqual = jest.fn();
+            mockAssertions.assertShouldNotExist = jest.fn();
         });
 
         test('should call \'it\' with default message if none passed in', () => {
@@ -682,14 +699,14 @@ describe('reduxMochaTestGenerators', () => {
 
             const message = 'should return the default state';
 
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             reducer(testReducer)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldReturnTheInitialState(expectedValue);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
 
         test('should call \'it\' with passed in message', () => {
@@ -698,19 +715,19 @@ describe('reduxMochaTestGenerators', () => {
                 switch (action.type) {
                     default:
                         return state;
-                };
+                }
             };
 
             const message = 'should return the default state123';
 
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             reducer(testReducer)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldReturnTheInitialState(expectedValue, message);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
 
         test(
@@ -726,20 +743,22 @@ describe('reduxMochaTestGenerators', () => {
                 };
 
                 reducer(testReducer)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .shouldReturnTheInitialState(expectedValue);
 
-                mockAssertions.assertShouldDeepEqual.calledWithExactly(initialState, expectedValue).should.be.true;
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][0]).toBe(initialState);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][1]).toBe(expectedValue);
             }
         );
     });
     describe('reducer.shouldHandleAction', () => {
         beforeEach(() => {
-            fakeGlobal.it = (message, fn) => {
+            fakeGlobal.test = (message, fn) => {
                 fn();
             };
-            mockAssertions.assertShouldDeepEqual = sinon.stub();
-            mockAssertions.assertShouldNotExist = sinon.stub();
+            mockAssertions.assertShouldDeepEqual = jest.fn();
+            mockAssertions.assertShouldNotExist = jest.fn();
         });
 
         test('should throw an error if no action is passed in', () => {
@@ -750,11 +769,11 @@ describe('reduxMochaTestGenerators', () => {
                 }
             };
 
-            (() => {
+            expect(() => {
                 reducer(testReducer)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                .shouldHandleAction();
-            }).should.throw('action is required');
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
+                    .shouldHandleAction();
+            }).toThrow('action is required');
         });
 
         test('should throw an error if no action doesn\'t have a type', () => {
@@ -766,11 +785,11 @@ describe('reduxMochaTestGenerators', () => {
                 }
             };
 
-            (() => {
+            expect(() => {
                 reducer(testReducer)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
-                .shouldHandleAction(action);
-            }).should.throw('an action must have a type');
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
+                    .shouldHandleAction(action);
+            }).toThrow('an action must have a type');
         });
 
         test('should call \'it\' with default message if none passed in', () => {
@@ -785,14 +804,14 @@ describe('reduxMochaTestGenerators', () => {
 
             const message = `should handle ${action.type}`;
 
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             reducer(testReducer)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldHandleAction(action, expectedValue);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
         test('should call \'it\' with passed in message', () => {
             const action = { type: 'SOME_ACTION' };
@@ -806,14 +825,14 @@ describe('reduxMochaTestGenerators', () => {
 
             const message = 'some message';
 
-            const spy = sinon.spy(fakeGlobal, 'it');
+            const spy = jest.spyOn(fakeGlobal, 'test');
 
             reducer(testReducer)
-                .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                 .shouldHandleAction(action, expectedValue, undefined, message);
 
-            spy.callCount.should.deep.equal(1);
-            spy.args[0][0].should.deep.equal(message);
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(spy.mock.calls[0][0]).toEqual(message);
         });
 
         test(
@@ -834,10 +853,13 @@ describe('reduxMochaTestGenerators', () => {
 
 
                 reducer(testReducer)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .shouldHandleAction(action, expectedValue);
 
-                mockAssertions.assertShouldDeepEqual.calledWithExactly(newValue, expectedValue).should.be.true;
+
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][0]).toBe(newValue);
+                expect(mockAssertions.assertShouldDeepEqual.mock.calls[0][1]).toBe(expectedValue);
             }
         );
         test(
@@ -857,10 +879,11 @@ describe('reduxMochaTestGenerators', () => {
                 };
 
                 reducer(testReducer)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .shouldHandleAction(action, expectedValue);
 
-                mockAssertions.assertShouldNotExist.calledWithExactly(newValue).should.be.true;
+                expect(mockAssertions.assertShouldNotExist.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldNotExist.mock.calls[0][0]).toBe(newValue);
             }
         );
         test(
@@ -880,10 +903,11 @@ describe('reduxMochaTestGenerators', () => {
                 };
 
                 reducer(testReducer)
-                    .mochaMocks(fakeGlobal.describe, fakeGlobal.it)
+                    .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .shouldHandleAction(action, expectedValue);
 
-                mockAssertions.assertShouldNotExist.calledWithExactly(newValue).should.be.true;
+                expect(mockAssertions.assertShouldNotExist.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldNotExist.mock.calls[0][0]).toBe(newValue);
             }
         );
 
