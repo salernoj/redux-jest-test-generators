@@ -1,6 +1,4 @@
-/*global require, describe, it */
-
-require('chai').should();
+/*global  describe */
 
 import {
     SOME_ACTION_NO_ARGS,
@@ -14,9 +12,8 @@ import {
 } from './reducers';
 
 import {
-    reducer,
-    shouldReturnTheInitialState
-} from '../lib/reduxMochaTestGenerators';
+    reducer
+} from '../lib/reduxJestTestGenerators';
 
 describe('reducers', () => {
     describe('reducerNullInitial', () => {

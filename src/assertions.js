@@ -1,6 +1,5 @@
-/*global require*/
+/*global expect */
 
-const should = require('chai').should();
 
 /**
  * Wrapper for should.deep.equal from chai
@@ -8,15 +7,23 @@ const should = require('chai').should();
  * @param {object} b - The object to compare to
  */
 export const assertShouldDeepEqual = (a, b) => {
-    a.should.deep.equal(b);
+    expect(a).toEqual(b);
 };
 
 /**
  * Wrapper for should.not.exist from chai
  * @param {object} a - The object to check
  */
-export const assertShouldNotExist = a => {
-    should.not.exist(a);
+export const assertShouldBeNull = a => {
+    expect(a).toBeNull();
+};
+
+/**
+ * Wrapper for should.not.exist from chai
+ * @param {object} a - The object to check
+ */
+export const assertShouldBeUndefined = a => {
+    expect(a).toBeUndefined();
 };
 
 /**
@@ -24,5 +31,5 @@ export const assertShouldNotExist = a => {
  * @param {object} a - The object to check
  */
 export const assertShouldExist = a => {
-    should.exist(a);
+    expect(a).toBeDefined();
 };

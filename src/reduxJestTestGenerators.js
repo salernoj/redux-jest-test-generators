@@ -9,7 +9,8 @@ const mockStore = configureMockStore(middlewares);
 import {
     assertShouldDeepEqual,
     assertShouldExist,
-    assertShouldNotExist
+    assertShouldBeNull,
+    assertShouldBeUndefined
 } from './assertions';
 
 /**
@@ -205,8 +206,10 @@ const wrapInItBlock = (test, message, callback) => {
  * Compare expected value to state
  */
 const compareExpectedToState = (expectedValue, state) => {
-    if (expectedValue === null || expectedValue === undefined) {
-        assertShouldNotExist(state);
+    if (expectedValue === null) {
+        assertShouldBeNull(state);
+    } else if (expectedValue === undefined) {
+        assertShouldBeUndefined(state);
     } else {
         assertShouldExist(state);
         assertShouldDeepEqual(state, expectedValue);

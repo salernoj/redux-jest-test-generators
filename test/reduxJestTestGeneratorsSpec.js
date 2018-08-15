@@ -4,7 +4,8 @@
 const mockAssertions = {
     assertShouldDeepEqual: jest.fn(),
     assertShouldExist: jest.fn(),
-    assertShouldNotExist: jest.fn()
+    assertShouldBeNull: jest.fn(),
+    assertShouldBeUndefined: jest.fn()
 };
 
 jest.mock('../src/assertions', () => mockAssertions);
@@ -684,8 +685,6 @@ describe('reduxJestTestGenerators', () => {
             fakeGlobal.test = (message, fn) => {
                 fn();
             };
-            mockAssertions.assertShouldDeepEqual = jest.fn();
-            mockAssertions.assertShouldNotExist = jest.fn();
         });
 
         test('should call \'it\' with default message if none passed in', () => {
@@ -757,8 +756,6 @@ describe('reduxJestTestGenerators', () => {
             fakeGlobal.test = (message, fn) => {
                 fn();
             };
-            mockAssertions.assertShouldDeepEqual = jest.fn();
-            mockAssertions.assertShouldNotExist = jest.fn();
         });
 
         test('should throw an error if no action is passed in', () => {
@@ -863,7 +860,7 @@ describe('reduxJestTestGenerators', () => {
             }
         );
         test(
-            'should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is null',
+            'should call assertShouldBeNull on reducer\'s value when handling the passed in action and expectedValue is null',
             () => {
                 const expectedValue = null;
                 const action = { type: 'SOME_ACTION' };
@@ -882,12 +879,12 @@ describe('reduxJestTestGenerators', () => {
                     .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .shouldHandleAction(action, expectedValue);
 
-                expect(mockAssertions.assertShouldNotExist.mock.calls.length).toBe(1);
-                expect(mockAssertions.assertShouldNotExist.mock.calls[0][0]).toBe(newValue);
+                expect(mockAssertions.assertShouldBeNull.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldBeNull.mock.calls[0][0]).toBe(newValue);
             }
         );
         test(
-            'should call assertShouldNotExist on reducer\'s value when handling the passed in action and expectedValue is undefined',
+            'should call assertShouldBeUndefined on reducer\'s value when handling the passed in action and expectedValue is undefined',
             () => {
                 const expectedValue = undefined;
                 const action = { type: 'SOME_ACTION' };
@@ -906,8 +903,8 @@ describe('reduxJestTestGenerators', () => {
                     .jestMocks(fakeGlobal.describe, fakeGlobal.test)
                     .shouldHandleAction(action, expectedValue);
 
-                expect(mockAssertions.assertShouldNotExist.mock.calls.length).toBe(1);
-                expect(mockAssertions.assertShouldNotExist.mock.calls[0][0]).toBe(newValue);
+                expect(mockAssertions.assertShouldBeUndefined.mock.calls.length).toBe(1);
+                expect(mockAssertions.assertShouldBeUndefined.mock.calls[0][0]).toBe(newValue);
             }
         );
 

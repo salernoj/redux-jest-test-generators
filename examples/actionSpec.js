@@ -1,10 +1,8 @@
-/*global require, describe, it */
-
-require('chai').should();
+/*global describe */
 
 import {
     actionCreator
-} from '../lib/reduxMochaTestGenerators';
+} from '../lib/reduxJestTestGenerators';
 
 import {
     SOME_ACTION_NO_ARGS,

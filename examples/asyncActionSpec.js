@@ -1,16 +1,15 @@
-/*global require, describe, it */
-require('chai').should();
-import sinon from 'sinon';
+/*global require, describe, jest */
 
 import {
     asyncActionCreator
-} from '../lib/reduxMochaTestGenerators';
+} from '../lib/reduxJestTestGenerators';
 
 const mockService = {
-    testService: sinon.stub()
+    testService: jest.fn()
 };
 
-const proxyquire = require('proxyquire').noCallThru();
+jest.mock('./services', () => mockService);
+
 const {
     RECEIVE,
     RECEIVE_ERROR,
@@ -20,11 +19,7 @@ const {
     REQUEST_WITH_ARGS,
     callService,
     callServiceWithArgs,
-} = proxyquire('./asyncActions',
-    {
-        './services': mockService
-    }
-);
+} = require('./asyncActions');
 
 describe('asyncActions', () => {
 
@@ -35,7 +30,7 @@ describe('asyncActions', () => {
             .wrapInDescribe(false)
             .success(true)
             .setUp(() => {
-                mockService.testService.returns(new Promise(resolve => resolve(result)));
+                mockService.testService.mockReturnValueOnce(new Promise(resolve => resolve(result)));
             })
             .shouldDispatchActions(successActions);
        
@@ -45,7 +40,7 @@ describe('asyncActions', () => {
             .wrapInDescribe(false)
             .success(false)
             .setUp(() => {
-                mockService.testService.returns(new Promise((resolve, reject) => reject(error)));
+                mockService.testService.mockReturnValueOnce(new Promise((resolve, reject) => reject(error)));
             })
             .shouldDispatchActions(failureActions);
     });
@@ -58,7 +53,7 @@ describe('asyncActions', () => {
         ];
         asyncActionCreator(callServiceWithArgs)
             .setUp(() => {
-                mockService.testService.returns(new Promise(resolve => resolve(resultWithArgs)));
+                mockService.testService.mockReturnValueOnce(new Promise(resolve => resolve(resultWithArgs)));
             })
             .success(true)
             .withArgs(trueOrFalse)
@@ -71,7 +66,7 @@ describe('asyncActions', () => {
         ];
         asyncActionCreator(callServiceWithArgs)
             .setUp(() => {
-                mockService.testService.returns(new Promise((resolve, reject) => reject(errorWithArgs)));
+                mockService.testService.mockReturnValueOnce(new Promise((resolve, reject) => reject(errorWithArgs)));
             })
             .success(true)
             .withArgs(trueOrFalse)
