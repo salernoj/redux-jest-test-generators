@@ -1,13 +1,13 @@
-# redux-mocha-test-generators
-Methods for testing redux action creators, async action creators, and reducers with mocha to avoid repetitive boilerplate.
+# redux-jest-test-generators
+Methods for testing redux action creators, async action creators, and reducers with jest to avoid repetitive boilerplate.
 
-[![Build Status](https://travis-ci.org/jesalerno84/redux-mocha-test-generators.svg?branch=master)](https://travis-ci.org/jesalerno84/redux-mocha-test-generators)
-[![Code Climate](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators/badges/gpa.svg)](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators)
-[![Test Coverage](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators/badges/coverage.svg)](https://codeclimate.com/github/jesalerno84/redux-mocha-test-generators/coverage)
+[![Build Status](https://travis-ci.org/salernoj/redux-jest-test-generators.svg?branch=master)](https://travis-ci.org/salernoj/redux-jest-test-generators)
+[![Code Climate](https://codeclimate.com/github/salernoj/redux-jest-test-generators/badges/gpa.svg)](https://codeclimate.com/github/salernoj/redux-jest-test-generators)
+[![Test Coverage](https://codeclimate.com/github/salernoj/redux-jest-test-generators/badges/coverage.svg)](https://codeclimate.com/github/salernoj/redux-jest-test-generators/coverage)
 
 ## Installation
 ```
-npm install redux-mocha-test-generators
+npm install redux-jest-test-generators
 ```
 ## Usage
 
@@ -23,7 +23,7 @@ then chain the test methods to the result.
 You can test that an actionCreator creates the correct action
 
 ```javascript
-import {actionCreator} from 'redux-mocha-test-generators';
+import {actionCreator} from 'redux-jest-test-generators';
 import {SOME_ACTION_NO_ARGS, someActionNoArgs, SOME_ACTION_WITH_ARGS, someActionWithArgs} from 'actions';
 
 actionCreator(someActionNoArgs)
@@ -50,7 +50,7 @@ You can test the actions dispatched for both successful and unsuccessful async c
 __NOTE: your async action creators must return a promise for this to work__
 
 ```javascript
-import {asyncActionCreator} from 'redux-mocha-test-generators';
+import {asyncActionCreator} from 'redux-jest-test-generators';
 import {someAsyncActionCreator} from 'async-action-creators';
 import {someMockFn} from 'mocks';
 
@@ -101,7 +101,7 @@ chain the test methods to the result.
 
 You can test that a reducer is returning the correct initial state
 ```javascript
-import {reducer} from 'redux-mocha-test-generators';
+import {reducer} from 'redux-jest-test-generators';
 import {someReducer} from 'reducers';
 
 reducer(someReducer)
@@ -112,7 +112,7 @@ reducer(someReducer)
 You can test that a reducer handles an action correctly by passing in the action, 
 the expected value, an optional previous value, and an optional message.
 ```javascript
-import {reducer} from 'redux-mocha-test-generators';
+import {reducer} from 'redux-jest-test-generators';
 import {SOME_ACTION} from 'actions';
 import {someReducer} from 'reducers';
 
@@ -124,7 +124,7 @@ reducer(someReducer)
 reducer(someReducer)
     .shouldHandleAction({type: SOME_ACTION, val: 1}, 1, 2);
 
-// with a previous value and the message for the mocha it assertion
+// with a previous value and the message for the jest it assertion
 reducer(someReducer)
     .shouldHandleAction({type: SOME_ACTION, val: 1}, 1, 2, 'should set the value to 1');
 
@@ -132,7 +132,7 @@ reducer(someReducer)
 You can also chain together a shouldReturnTheInitialState and multiple shouldHandleAction 
 methods.
 ```javascript
-import {reducer} from 'redux-mocha-test-generators';
+import {reducer} from 'redux-jest-test-generators';
 import {SOME_ACTION, ANOTHER_ACTION} from 'actions';
 import {someReducer} from 'reducers';
 

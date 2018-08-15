@@ -1,5 +1,5 @@
 {
-  "name": "redux-mocha-test-generators",
+  "name": "redux-jest-test-generators",
   "version": "1.0.0",
   "description": "A collection of methods to generate tests for redux actions, reducers, etc.",
   "main": "index.js",
@@ -13,19 +13,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jesalerno84/redux-mocha-test-generators.git"
+    "url": "git+https://github.com/salernoj/redux-jest-test-generators.git"
   },
   "keywords": [
     "redux",
     "test",
-    "mocha"
+    "jest"
   ],
   "author": "Jeff Salerno",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jesalerno84/redux-mocha-test-generators/issues"
+    "url": "https://github.com/salernoj/redux-jest-test-generators/issues"
   },
-  "homepage": "https://github.com/jesalerno84/redux-mocha-test-generators#readme",
+  "homepage": "https://github.com/salernoj/redux-jest-test-generators#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
