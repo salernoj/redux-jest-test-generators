@@ -3,3 +3,9 @@ node_js:
   - "8"
 after_script:
   - codeclimate-test-reporter < ./coverage/lcov.info
+deploy:
+  - provider: npm
+  - email: 'jesalerno84@gmail.com'
+  - api: $NPM_TOKEN
+  - on
+    - branch: master
