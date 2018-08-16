@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "babel src -d lib",
-    "test-watch": "jest --watch",
+    "test-watch": "jest --watch --config jest.config.examples.js",
     "test-examples": "babel src -d lib && jest --config jest.config.examples.js",
-    "test": "jest --coverage",
+    "test": "jest --coverage --config jest.config.examples.js",
     "lint": "eslint src/** --ext .js",
     "lint-examples": "eslint examples/** --ext .js"
   },
